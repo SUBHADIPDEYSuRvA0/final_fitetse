@@ -1,0 +1,22 @@
+<% layout('user/panel/layout', { title: 'My Meetings', activePage: 'meetings', user: user }) %>
+
+<div class="container-fluid">
+  <h2 class="mb-4">My Meetings</h2>
+  <div class="table-responsive">
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Employee</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="meetingsTableBody">
+        <!-- Meetings will be loaded here by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="/public/js/user-panel/meetings.js"></script> 

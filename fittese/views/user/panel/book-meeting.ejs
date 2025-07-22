@@ -1,0 +1,27 @@
+<% layout('user/panel/layout', { title: 'Book Meeting', activePage: 'book', user: user }) %>
+
+<div class="container-fluid">
+  <h2 class="mb-4">Book a Meeting</h2>
+  <form id="bookMeetingForm" class="bg-dark p-4 rounded">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="employee" class="form-label">Select Employee</label>
+        <select id="employee" name="employeeId" class="form-select" required></select>
+      </div>
+      <div class="col-md-6">
+        <label for="date" class="form-label">Select Date</label>
+        <input type="date" id="date" name="date" class="form-control" required>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Available Slots</label>
+      <div id="availableSlots" class="d-flex flex-wrap"></div>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea id="description" name="description" class="form-control" rows="2" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Book Meeting</button>
+  </form>
+</div>
+<script src="/public/js/user-panel/book-meeting.js"></script> 

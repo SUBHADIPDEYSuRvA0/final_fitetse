@@ -1,0 +1,149 @@
+<%- include('partials/header.ejs') %>
+
+<div id="content">
+  <%- include('partials/navbar.ejs') %>
+
+  <div class="container mt-4">
+    <div class="card shadow-lg mb-4">
+      <div class="card-header bg-primary text-white">
+        <h3 class="mb-0">Add New Employee</h3>
+      </div>
+      <div class="card-body">
+        <form action="/admin/add-employee" method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Employee Name (Alias)</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phone</label>
+              <input type="text" class="form-control" name="phone" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Employee Type</label>
+              <select class="form-select" name="employeetype" required>
+                <option value="" disabled selected>Select type</option>
+                <% employeetypes.forEach(type => { %>
+                  <option value="<%= type._id %>"><%= type.type %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+                  <span class="input-group-text" id="togglePassword">
+                    <i class="bi bi-eye" id="eyeIcon"></i>
+                  </span>
+                </div>
+              </div>
+              <script>
+                const togglePassword = document.querySelector('#togglePassword');
+                const password = document.querySelector('#password');
+                const eyeIcon = document.querySelector('#eyeIcon');
+            
+                togglePassword.addEventListener('click', () => {
+                  const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                  password.setAttribute('type', type);
+            
+                  // Toggle icon
+                  eyeIcon.classList.toggle('bi-eye');
+                  eyeIcon.classList.toggle('bi-eye-slash');
+                });
+              </script>
+          </div>
+          <button type="submit" class="btn btn-success mt-3">Add Employee</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Search Field -->
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="Search employee by name, email, or phone...">
+    </div>
+
+    <!-- Employee Table -->
+    <div class="table-responsive">
+      <table class="table table-bordered shadow-sm table-hover bg-white">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Calling ID</th>
+            <th>Type</th>
+            <th>Created</th>
+            <th>Status</th>
+            <th>Action</th>
+
+          </tr>
+        </thead>
+        <tbody id="employeeTable">
+            <% employees.forEach((emp, i) => { %>
+                <tr>
+                  <td><%= i + 1 %></td>
+                  <td><%= emp.name %></td>
+                  <td><%= emp.email %></td>
+                  <td><%= emp.phone %></td>
+                  <td><%= emp.callingid %></td>
+                  <td><%= emp.employeetype?.type || 'N/A' %></td>
+                  <td><%= emp.createdAt.toDateString() %></td>
+              
+                  <!-- Status -->
+                  <td><%= emp.isStatus === "active" ? "Unblocked" : "Blocked" %></td>
+              
+                  <!-- Action Button -->
+                  <td>
+                    <form action="/admin/toggle-status/<%= emp._id %>" method="POST" style="display:inline;">
+                      <button 
+                        class="btn btn-sm <%= emp.isStatus === 'active' ? 'btn-danger' : 'btn-success' %>">
+                        <%= emp.isStatus === 'active' ? 'Block' : 'Unblock' %>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+              
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- JS for AJAX search -->
+<script>
+  const searchInput = document.getElementById('searchInput');
+
+  searchInput.addEventListener('keyup', async () => {
+    const query = searchInput.value.trim();
+    const response = await fetch(`/admin/search-employee?q=${encodeURIComponent(query)}`);
+    const employees = await response.json();
+
+    const tbody = document.getElementById('employeeTable');
+    tbody.innerHTML = '';
+
+    if (employees.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center">No employees found.</td></tr>';
+      return;
+    }
+
+    employees.forEach((emp, i) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${emp.name}</td>
+          <td>${emp.email}</td>
+          <td>${emp.phone}</td>
+          <td>${emp.callingid}</td>
+          <td>${emp.employeetype?.type || 'N/A'}</td>
+          <td>${new Date(emp.createdAt).toDateString()}</td>
+        </tr>
+      `;
+    });
+  });
+</script>

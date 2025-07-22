@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitetse - Doctor Portal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+   <style>
+    :root {
+  --primary-color: #0b3d2e;
+  --primary-light: #12634a;
+  --primary-dark: #072218;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --accent: #4ecdc4;
+  --text-dark: #333333;
+  --text-light: #6c757d;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-gray);
+  overflow-x: hidden;
+}
+
+/* Animation Side */
+.animation-side {
+  background-color: var(--primary-color);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.animation-side::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, var(--primary-light) 0%, transparent 70%);
+  opacity: 0.3;
+}
+
+.animation-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Pulse Animation */
+.pulse-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pulse-circle {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  animation: pulse 4s infinite;
+}
+
+.pulse-circle:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.pulse-circle:nth-child(3) {
+  animation-delay: 2s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* DNA Helix Animation */
+.dna-container {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  perspective: 1000px;
+}
+
+.dna-helix {
+  position: relative;
+  width: 100px;
+  height: 300px;
+  transform-style: preserve-3d;
+  animation: rotate 20s linear infinite;
+}
+
+.dna-strand {
+  position: absolute;
+  width: 20px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  transform-style: preserve-3d;
+}
+
+.dna-strand:nth-child(odd) {
+  left: 0;
+  background-color: var(--accent);
+  opacity: 0.3;
+}
+
+.dna-strand:nth-child(even) {
+  right: 0;
+  background-color: var(--white);
+  opacity: 0.3;
+}
+
+.dna-strand:nth-child(1) {
+  top: 0;
+  transform: rotateY(0deg);
+}
+.dna-strand:nth-child(2) {
+  top: 0;
+  transform: rotateY(180deg);
+}
+.dna-strand:nth-child(3) {
+  top: 40px;
+  transform: rotateY(45deg);
+}
+.dna-strand:nth-child(4) {
+  top: 40px;
+  transform: rotateY(225deg);
+}
+.dna-strand:nth-child(5) {
+  top: 80px;
+  transform: rotateY(90deg);
+}
+.dna-strand:nth-child(6) {
+  top: 80px;
+  transform: rotateY(270deg);
+}
+.dna-strand:nth-child(7) {
+  top: 120px;
+  transform: rotateY(135deg);
+}
+.dna-strand:nth-child(8) {
+  top: 120px;
+  transform: rotateY(315deg);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotateY(0) rotateX(20deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(20deg);
+  }
+}
+
+/* Hexagon Animation */
+.hexagon-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.hexagon {
+  position: absolute;
+  width: 60px;
+  height: 35px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: float 10s infinite ease-in-out;
+}
+
+.hexagon:before,
+.hexagon:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  border-left: 30px solid transparent;
+  border-right: 30px solid transparent;
+}
+
+.hexagon:before {
+  bottom: 100%;
+  border-bottom: 17.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.hexagon:after {
+  top: 100%;
+  border-top: 17.5px solid rgba(255, 255, 255, 0.05);
+}
+
+.hexagon:nth-child(1) {
+  top: 20%;
+  left: 70%;
+  animation-delay: 0s;
+}
+
+.hexagon:nth-child(2) {
+  top: 40%;
+  left: 80%;
+  animation-delay: 2s;
+}
+
+.hexagon:nth-child(3) {
+  top: 60%;
+  left: 75%;
+  animation-delay: 4s;
+}
+
+.hexagon:nth-child(4) {
+  top: 80%;
+  left: 65%;
+  animation-delay: 6s;
+}
+
+.hexagon:nth-child(5) {
+  top: 30%;
+  left: 60%;
+  animation-delay: 8s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
+}
+
+/* Brand Container */
+.brand-container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--white);
+  margin-top: 60%;
+}
+
+.brand-container img {
+  max-width: 150px;
+  margin-bottom: 20px;
+}
+
+.brand-name {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.brand-tagline {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+/* Login Side */
+.login-side {
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  width: 80%;
+  max-width: 450px;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo-container {
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 10px 20px rgba(11, 61, 46, 0.2);
+}
+
+.logo i {
+  font-size: 2.5rem;
+  color: var(--white);
+}
+
+.login-header h2 {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  color: var(--text-light);
+}
+
+/* Form Styling */
+.form-floating .form-control {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  padding: 1.2rem 1rem;
+}
+
+.form-floating .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(11, 61, 46, 0.25);
+}
+
+.form-floating label {
+  padding: 1.2rem 1rem;
+}
+
+.password-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--text-light);
+  z-index: 10;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.forgot-password {
+  float: right;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(11, 61, 46, 0.3);
+}
+
+.login-btn span {
+  margin-right: 10px;
+}
+
+/* Login Footer */
+.login-footer {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.biometric-login p {
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.biometric-login p::before,
+.biometric-login p::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+.biometric-login p::before {
+  left: 0;
+}
+
+.biometric-login p::after {
+  right: 0;
+}
+
+.biometric-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.biometric-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid #e0e0e0;
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.biometric-btn i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.biometric-btn:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.biometric-btn:hover i {
+  color: var(--white);
+}
+
+.help-section p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.help-section a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Notification Styling */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+}
+
+.notification-content i {
+  margin-right: 10px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+  .login-container {
+    width: 90%;
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-container {
+    width: 95%;
+  }
+
+  .brand-name {
+    font-size: 2.5rem;
+  }
+
+  .brand-tagline {
+    font-size: 1rem;
+  }
+}
+
+   </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row vh-100">
+            <!-- Left side - Animation and branding -->
+            <div class="col-lg-7 d-none d-lg-flex animation-side">
+                <div class="animation-container">
+                    <div class="pulse-container">
+                        <div class="pulse-circle"></div>
+                        <div class="pulse-circle"></div>
+                        <div class="pulse-circle"></div>
+                    </div>
+                    <div class="dna-container">
+                        <div class="dna-helix">
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                            <div class="dna-strand"></div>
+                        </div>
+                    </div>
+                    <div class="hexagon-container">
+                        <div class="hexagon"></div>
+                        <div class="hexagon"></div>
+                        <div class="hexagon"></div>
+                        <div class="hexagon"></div>
+                        <div class="hexagon"></div>
+                    </div>
+                </div>
+                <div class="brand-container">
+                    <img src="/image.png" alt="">
+                    <h1 class="brand-name">FITETSE</h1>
+                    <p class="brand-tagline">Advanced Healthcare Management System</p>
+                </div>
+            </div>
+            
+            <!-- Right side - Login form -->
+            <div class="col-lg-5 col-md-12 login-side">
+                <div class="login-container">
+                    <div class="login-header">
+                        <div class="logo-container">
+                            <div class="logo">
+                                <i class="fas fa-staff-snake"></i>
+                            </div>
+                        </div>
+                        <h2>Employee Portal</h2>
+                        <p>Enter your credentials to access your dashboard</p>
+                    </div>
+                    
+                    <div class="login-form">
+                        <form id="loginForm" action="/employee/auth/login" method="POST">
+                            <div class="form-floating mb-4">
+                                <input type="text" class="form-control" id="employeeId" name="email" placeholder="Employee Email" required>
+                                <label for="employeeId">Employee Email</label>
+                            </div>
+                            
+                            <div class="form-floating mb-4 password-container">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                                <label for="password">Password</label>
+                                <span class="password-toggle" onclick="togglePassword()">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                            
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" name="remember">
+                                <label class="form-check-label" for="rememberMe">
+                                    Remember me
+                                </label>
+                                <a href="/employee/auth/forgot-password" class="forgot-password">Forgot password?</a>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary login-btn">
+                                <span>Login</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="login-footer">
+                        <div class="biometric-login">
+                            <p>Or login with</p>
+                            <div class="biometric-options">
+                                <button class="biometric-btn" title="Fingerprint Login" id="fingerprintLogin">
+                                    <i class="fas fa-fingerprint"></i>
+                                </button>
+                                <button class="biometric-btn" title="Face ID" id="faceIdLogin">
+                                    <i class="fas fa-face-viewfinder"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section">
+                            <p>Need help? <a href="/support">Contact IT Support</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Toggle password visibility
+function togglePassword() {
+  const passwordInput = document.getElementById("password")
+  const passwordToggle = document.querySelector(".password-toggle i")
+
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text"
+    passwordToggle.classList.remove("fa-eye")
+    passwordToggle.classList.add("fa-eye-slash")
+  } else {
+    passwordInput.type = "password"
+    passwordToggle.classList.remove("fa-eye-slash")
+    passwordToggle.classList.add("fa-eye")
+  }
+}
+
+// Add loading animation to login button
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("loginForm")
+  const loginBtn = document.querySelector(".login-btn")
+
+  // Handle form submission
+  loginForm.addEventListener("submit", (e) => {
+    // Show loading state
+    loginBtn.innerHTML =
+      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Logging in...'
+    loginBtn.disabled = true
+
+    // Let the form submit naturally to the backend
+    // No e.preventDefault() here, so the form will submit to the action URL
+
+    // We're just adding a small delay to show the loading state
+    // This is optional and can be removed if not needed
+    setTimeout(() => {
+      // The form will have already submitted by this point
+      // This is just a fallback in case the form submission is taking too long
+      if (loginBtn.disabled) {
+        loginBtn.innerHTML = '<span>Login</span><i class="fas fa-arrow-right"></i>'
+        loginBtn.disabled = false
+      }
+    }, 10000) // 10 second timeout as a fallback
+  })
+
+  // Initialize floating animations
+  initializeAnimations()
+
+  // Handle biometric login buttons
+  document.getElementById("fingerprintLogin").addEventListener("click", () => {
+    showNotification("Fingerprint login is not available yet")
+  })
+
+  document.getElementById("faceIdLogin").addEventListener("click", () => {
+    showNotification("Face ID login is not available yet")
+  })
+})
+
+// Show notification
+function showNotification(message) {
+  // Create notification element
+  const notification = document.createElement("div")
+  notification.className = "notification"
+  notification.innerHTML = `
+    <div class="notification-content">
+      <i class="fas fa-info-circle"></i>
+      <span>${message}</span>
+    </div>
+  `
+
+  // Add to body
+  document.body.appendChild(notification)
+
+  // Show notification
+  setTimeout(() => {
+    notification.style.opacity = "1"
+    notification.style.transform = "translateY(0)"
+  }, 10)
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.style.opacity = "0"
+    notification.style.transform = "translateY(20px)"
+
+    setTimeout(() => {
+      document.body.removeChild(notification)
+    }, 300)
+  }, 3000)
+}
+
+// Initialize animations
+function initializeAnimations() {
+  // Add random floating hexagons
+  const hexContainer = document.querySelector(".hexagon-container")
+
+  if (hexContainer) {
+    for (let i = 0; i < 10; i++) {
+      const hex = document.createElement("div")
+      hex.className = "hexagon"
+      hex.style.top = `${Math.random() * 100}%`
+      hex.style.left = `${Math.random() * 100}%`
+      hex.style.animationDelay = `${Math.random() * 10}s`
+      hex.style.opacity = `${Math.random() * 0.5}`
+      hex.style.transform = `scale(${0.5 + Math.random()})`
+
+      hexContainer.appendChild(hex)
+    }
+  }
+}
+
+    </script>
+</body>
+</html>

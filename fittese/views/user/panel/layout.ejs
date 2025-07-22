@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Panel - <%= title || 'Dashboard' %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/public/style.css" rel="stylesheet">
+  <style>
+    body { background: #181c20; color: #fff; }
+    .sidebar { background: #23272b; min-height: 100vh; }
+    .sidebar .nav-link { color: #fff; }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover { background: #0d6efd; color: #fff; }
+    .content-area { padding: 2rem; }
+    .navbar { background: #23272b; }
+    .navbar-brand { color: #fff; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+  </style>
+</head>
+<body>
+  <%- include('user/panel/partials/navbar', { activePage, user }) %>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <nav class="col-md-2 d-none d-md-block sidebar py-4">
+        <div class="position-sticky">
+          <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+              <a class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>" href="/user/panel">
+                <i class="bi bi-house"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item mb-2">
+              <a class="nav-link <%= activePage === 'book' ? 'active' : '' %>" href="/user/panel/book">
+                <i class="bi bi-calendar-plus"></i> Book Meeting
+              </a>
+            </li>
+            <li class="nav-item mb-2">
+              <a class="nav-link <%= activePage === 'meetings' ? 'active' : '' %>" href="/user/panel/meetings">
+                <i class="bi bi-calendar-event"></i> My Meetings
+              </a>
+            </li>
+            <li class="nav-item mb-2">
+              <a class="nav-link <%= activePage === 'payments' ? 'active' : '' %>" href="/user/panel/payments">
+                <i class="bi bi-credit-card"></i> Payments
+              </a>
+            </li>
+            <li class="nav-item mb-2">
+              <a class="nav-link <%= activePage === 'profile' ? 'active' : '' %>" href="/user/panel/profile">
+                <i class="bi bi-person"></i> Profile
+              </a>
+            </li>
+            <li class="nav-item mt-4">
+              <a class="nav-link text-danger" href="/user/logout">
+                <i class="bi bi-box-arrow-right"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <!-- Main Content -->
+      <main class="col-md-10 ms-sm-auto px-md-4 content-area">
+        <!-- Page Content -->
+        <%- body %>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/public/js/user-panel/main.js"></script>
+</body>
+</html> 

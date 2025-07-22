@@ -1,0 +1,94 @@
+<%- include('partials/header.ejs') %>
+
+<div id="content">
+
+
+    <!-- Top Navbar -->
+    <%- include('partials/navbar.ejs') %>
+    <div class="container mt-5 p-4">
+    <h2>Edit Obecity Questions</h2>
+
+    <form method="POST" action="/admin/update">
+      <div id="question-container">
+        <% data.obecityquestions.forEach((q, i) => { %>
+          <div class="question-block mb-3 p-3 border bg-light rounded">
+            <label>Question <%= i+1 %></label>
+            <input type="text" name="questions" value="<%= q.question %>" class="form-control mb-2" required />
+    
+            <label>Options</label>
+            <% q.options.forEach(option => { %>
+              <input type="text" name="options[<%= i %>]" value="<%= option %>" class="form-control mb-2" required />
+            <% }) %>
+    
+            <button type="button" class="btn btn-sm btn-secondary add-option" data-index="<%= i %>">+ Add Option</button>
+            <hr />
+          </div>
+        <% }) %>
+      </div>
+    
+      <button type="button" class="btn btn-info mb-3" id="add-question">+ Add New Question</button>
+      <button type="submit" class="btn btn-success w-100">Save Changes</button>
+    </form>
+    
+    <script>
+      let questionIndex = `<%= data.obecityquestions.length %>`;
+    
+      document.getElementById("add-question").addEventListener("click", () => {
+        const container = document.getElementById("question-container");
+    
+        const div = document.createElement("div");
+        div.className = "question-block mb-3 p-3 border bg-light rounded";
+        div.innerHTML = `
+          <label>Question ${questionIndex + 1}</label>
+          <input type="text" name="questions" class="form-control mb-2" required />
+          <label>Options</label>
+          <input type="text" name="options[${questionIndex}]" class="form-control mb-2" required />
+          <button type="button" class="btn btn-sm btn-secondary add-option" data-index="${questionIndex}">+ Add Option</button>
+          <hr />
+        `;
+        container.appendChild(div);
+        questionIndex++;
+      });
+    
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("add-option")) {
+          const idx = e.target.getAttribute("data-index");
+          const input = document.createElement("input");
+          input.type = "text";
+          input.name = `options[${idx}]`;
+          input.className = "form-control mb-2";
+          input.required = true;
+          e.target.before(input);
+        }
+      });
+    </script>
+ 
+<!-- Bootstrap -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        // Initialize AOS animation
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Toggle Sidebar
+        document.getElementById('sidebarCollapse').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            sidebar.classList.toggle('collapsed');
+            content.classList.toggle('expanded');
+        });
+    </script>
+    </div>
+</div>
+  </body>
+  </html>

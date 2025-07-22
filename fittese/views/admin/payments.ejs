@@ -1,0 +1,267 @@
+<%- include('partials/header.ejs') %>
+
+<!-- Page Content -->
+<div id="content">
+    <!-- Top Navbar -->
+    <%- include('partials/navbar.ejs') %>
+
+    <!-- Payments Content -->
+    <div class="container-fluid py-4 px-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1">Payments Management</h2>
+                <p class="text-muted">Manage all payments and view paid users</p>
+            </div>
+        </div>
+
+        <!-- Payment Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card primary">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Total Revenue</h6>
+                            <h3 class="card-title mb-2">$<%= stats.totalRevenue %></h3>
+                            <span class="trend-indicator up">
+                                <i class="bi bi-arrow-up-short"></i> Active
+                            </span>
+                        </div>
+                        <div class="stat-icon text-primary">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card success">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Successful Payments</h6>
+                            <h3 class="card-title mb-2"><%= stats.successfulPayments %></h3>
+                            <span class="trend-indicator up">
+                                <i class="bi bi-arrow-up-short"></i> <%= stats.successRate %>%
+                            </span>
+                        </div>
+                        <div class="stat-icon text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card warning">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Pending Payments</h6>
+                            <h3 class="card-title mb-2"><%= stats.pendingPayments %></h3>
+                            <span class="trend-indicator down">
+                                <i class="bi bi-clock"></i> Awaiting
+                            </span>
+                        </div>
+                        <div class="stat-icon text-warning">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="card stat-card danger">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-subtitle mb-1 text-muted">Failed Payments</h6>
+                            <h3 class="card-title mb-2"><%= stats.failedPayments %></h3>
+                            <span class="trend-indicator down">
+                                <i class="bi bi-x-circle"></i> Failed
+                            </span>
+                        </div>
+                        <div class="stat-icon text-danger">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">All Status</option>
+                                    <option value="paid" <%= filters.status === 'paid' ? 'selected' : '' %>>Paid</option>
+                                    <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="failed" <%= filters.status === 'failed' ? 'selected' : '' %>>Failed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Search</label>
+                                <input type="text" name="search" class="form-control" placeholder="Search by user email, name, or payment ID" value="<%= filters.search || '' %>">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">All Payments</h5>
+                        <span class="badge bg-primary"><%= pagination.total %> payments</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Payment ID</th>
+                                        <th>User</th>
+                                        <th>Plan</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% payments.forEach(payment => { %>
+                                    <tr>
+                                        <td>
+                                            <code><%= payment.paymentId || payment._id %></code>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    <i class="bi bi-person-circle fs-4"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold"><%= payment.user?.name || 'N/A' %></div>
+                                                    <small class="text-muted"><%= payment.user?.email || 'N/A' %></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info"><%= payment.plan?.name || 'N/A' %></span>
+                                        </td>
+                                        <td>
+                                            <strong>$<%= (payment.amount / 100).toFixed(2) %></strong>
+                                        </td>
+                                        <td>
+                                            <% if (payment.status === 'paid') { %>
+                                                <span class="badge bg-success">Paid</span>
+                                            <% } else if (payment.status === 'pending') { %>
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            <% } else { %>
+                                                <span class="badge bg-danger">Failed</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <small><%= new Date(payment.createdAt).toLocaleDateString() %></small>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewPayment('<%= payment._id %>')">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <% if (pagination.pages > 1) { %>
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="Payments pagination">
+                    <ul class="pagination justify-content-center">
+                        <% for (let i = 1; i <= pagination.pages; i++) { %>
+                        <li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>&status=<%= filters.status %>&search=<%= filters.search %>"><%= i %></a>
+                        </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Paid Users Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Paid Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <% paidUsers.forEach(user => { %>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card border">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="avatar-sm me-3">
+                                                <i class="bi bi-person-circle fs-2"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1"><%= user.user.name %></h6>
+                                                <small class="text-muted"><%= user.user.email %></small>
+                                            </div>
+                                        </div>
+                                        <div class="row text-center">
+                                            <div class="col-4">
+                                                <div class="text-primary fw-bold">$<%= (user.totalPaid / 100).toFixed(2) %></div>
+                                                <small class="text-muted">Total Paid</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-success fw-bold"><%= user.paymentCount %></div>
+                                                <small class="text-muted">Payments</small>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-info fw-bold"><%= user.plan.name %></div>
+                                                <small class="text-muted">Current Plan</small>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                Last payment: <%= new Date(user.lastPayment).toLocaleDateString() %>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewPayment(paymentId) {
+    // Implement payment details view
+    console.log('Viewing payment:', paymentId);
+    alert('Payment details view - ID: ' + paymentId);
+}
+</script> 

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book a Demo Call</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Bootstrap & Flatpickr CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .form-section {
+      background-color: #1e1e1e;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .flatpickr-day.available {
+      background-color: #28a745 !important;
+      color: #fff !important;
+      border-radius: 50% !important;
+      cursor: pointer;
+    }
+
+    .flatpickr-day.disabled {
+      background-color: #6c757d !important;
+      color: white !important;
+      cursor: not-allowed;
+    }
+
+    .time-slot {
+      padding: 0.75rem 1rem;
+      margin: 0.5rem;
+      border-radius: 0.5rem;
+      background-color: #343a40;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .time-slot:hover {
+      background-color: #495057;
+    }
+
+    .time-slot.available {
+      background-color: #198754;
+    }
+
+    .time-slot.selected {
+      background-color: #0d6efd;
+    }
+
+    .time-slot.disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+
+    .section-title {
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Request a Demo Video Call</h2>
+    <form action="/admin/request-videocall" method="POST" class="form-section">
+      <div class="row">
+        <!-- Calendar -->
+        <div class="col-md-6 mb-4">
+          <label for="date" class="form-label">Select a Date</label>
+          <input type="text" class="form-control" id="date" name="date" placeholder="Pick a date" required>
+        </div>
+
+        <!-- Time Slots -->
+        <div class="col-md-6">
+          <label class="form-label">Available Time Slots</label>
+          <div id="available-times" class="d-flex flex-wrap"></div>
+        </div>
+      </div>
+
+      <hr class="my-4">
+      <h4 class="section-title">Answer a Few Questions</h4>
+
+      <% if (questions && questions.length > 0) { %>
+        <% questions.forEach((q) => { %>
+            <div class="mb-3">
+              <label class="form-label"><%= q.question %></label>
+              <% if (Array.isArray(q.options) && q.options.length > 0) { %>
+                <% q.options.forEach((opt, j) => { %>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="question[<%= q._id %>]" value="<%= opt %>" required>
+                    <label class="form-check-label"><%= opt %></label>
+                  </div>
+                <% }) %>
+              <% } else { %>
+                <p>No options available for this question.</p>
+              <% } %>
+            </div>
+          <% }) %>
+      <% } else { %>
+        <p>No questions available at this time.</p>
+      <% } %>
+
+      <!-- Contact Info -->
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label for="name" class="form-label">Your Name</label>
+          <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="email" class="form-label">Your Email</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="phone" name="phone" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Short Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Why are you booking a call?" required></textarea>
+      </div>
+
+      <!-- Hidden Fields -->
+      <input type="hidden" name="slotId" id="slotId" required>
+      <input type="hidden" name="selectedDate" id="selectedDate" required>
+
+      <button type="submit" class="btn btn-primary btn-lg mt-3 w-100">Request Video Call</button>
+    </form>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/slots');
+        const slots = await response.json();
+
+        const availableSlots = slots.filter(slot => slot.status === 'available');
+        const availableDates = [...new Set(availableSlots.map(slot =>
+          new Date(slot.start).toLocaleDateString()
+        ))];
+
+        flatpickr("#date", {
+          dateFormat: "Y-m-d",
+          minDate: "today",
+          onDayCreate: function (_, __, ___, dayElem) {
+            const dStr = dayElem.dateObj.toLocaleDateString();
+            if (availableDates.includes(dStr)) {
+              dayElem.classList.add('available');
+            } else {
+              dayElem.classList.add('disabled');
+            }
+          },
+          onChange: function (selectedDates) {
+            if (!selectedDates[0]) return;
+            const selectedDate = selectedDates[0].toLocaleDateString();
+            document.getElementById('selectedDate').value = selectedDate;
+            updateAvailableTimes(selectedDate);
+          }
+        });
+
+        function formatTimeRange(start, end) {
+          const options = { hour: '2-digit', minute: '2-digit' };
+          return `${new Date(start).toLocaleTimeString([], options)} - ${new Date(end).toLocaleTimeString([], options)}`;
+        }
+
+        function updateAvailableTimes(dateStr) {
+          const container = document.getElementById('available-times');
+          container.innerHTML = '';
+
+          const slotsForDate = availableSlots.filter(slot =>
+            new Date(slot.start).toLocaleDateString() === dateStr
+          );
+
+          if (slotsForDate.length === 0) {
+            container.innerHTML = '<div class="text-muted">No available slots for this date.</div>';
+            return;
+          }
+
+          slotsForDate.forEach(slot => {
+            const div = document.createElement('div');
+            div.className = 'time-slot available';
+            div.textContent = formatTimeRange(slot.start, slot.end);
+            div.dataset.slotId = slot._id;
+
+            div.addEventListener('click', () => {
+              document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+              div.classList.add('selected');
+              document.getElementById('slotId').value = slot._id;
+            });
+
+            container.appendChild(div);
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch slots:", err);
+      }
+    });
+  </script>
+
+
+<h2 class="mb-4">Users with Questions & Answers</h2>
+<table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Answers</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+        <tr>
+          <td><%= user.name %></td>
+          <td><%= user.email %></td>
+          <td><%= user.phone %></td>
+          <td>
+            <ul>
+              <% user.answers.forEach(ans => { %>
+                <li>
+                  <strong><%= ans.question %></strong><br>
+                  <em>Selected:</em> <%= ans.selectedAnswer %><br>
+                  <em>Options:</em> <%= ans.allOptions.join(', ') %>
+                </li>
+              <% }) %>
+            </ul>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  
+</body>
+</html>

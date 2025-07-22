@@ -1,0 +1,42 @@
+/* Counter.css */
+
+.counter-section {
+    background-color: #0b3d2e; /* Orange */
+    color: #ffffff; /* White text */
+    padding: 60px 20px;
+    /* border-radius: 10px; */
+    text-align: center;
+    font-family: "Cascadia Mono";
+  }
+  
+  .counter-heading {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+  }
+  
+  .counter-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .counter-item {
+    flex: 1 1 180px;
+    min-width: 150px;
+  }
+  
+  .counter-number {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .counter-label {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  

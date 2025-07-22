@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/user/panel">Fittese</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userPanelNavbar" aria-controls="userPanelNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="userPanelNavbar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>" href="/user/panel">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'book' ? 'active' : '' %>" href="/user/panel/book">Book Meeting</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'plans' ? 'active' : '' %>" href="/user/panel/plans">Plans</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'meetings' ? 'active' : '' %>" href="/user/panel/meetings">My Meetings</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'payments' ? 'active' : '' %>" href="/user/panel/payments">Payments</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= activePage === 'profile' ? 'active' : '' %>" href="/user/panel/profile">Profile</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/user/logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav> 

@@ -1,0 +1,21 @@
+<% layout('user/panel/layout', { title: 'Profile', activePage: 'profile', user: user }) %>
+
+<div class="container-fluid">
+  <h2 class="mb-4">Profile</h2>
+  <form id="profileForm" class="bg-dark p-4 rounded">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" id="name" name="name" class="form-control" value="<%= user && user.name ? user.name : '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" id="email" name="email" class="form-control" value="<%= user && user.email ? user.email : '' %>" required readonly>
+    </div>
+    <div class="mb-3">
+      <label for="phone" class="form-label">Phone</label>
+      <input type="text" id="phone" name="phone" class="form-control" value="<%= user && user.phone ? user.phone : '' %>">
+    </div>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+  </form>
+</div>
+<script src="/public/js/user-panel/profile.js"></script> 

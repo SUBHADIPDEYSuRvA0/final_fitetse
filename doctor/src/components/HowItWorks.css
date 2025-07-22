@@ -1,0 +1,54 @@
+.how-it-works {
+    padding: 50px 0;
+    text-align: center;
+    background-color: #0b3d2e;
+    color: white;
+  }
+  
+  .how-it-works h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: white;
+  }
+  
+  .steps-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .step {
+    flex: 1 1 22%;
+    margin: 20px;
+    padding: 20px;
+    background-color: #0b3d2e;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .step:hover {
+    transform: translateY(-10px);
+  }
+  
+  .step h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    
+  }
+  
+  .step p {
+    font-size: 1rem;
+    
+  }
+  
+  .step-icon {
+    margin-bottom: 15px;
+    /* Set the size for the Lottie animation */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

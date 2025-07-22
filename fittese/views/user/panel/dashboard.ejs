@@ -1,0 +1,52 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Welcome, <%= user && user.name ? user.name : 'User' %>!</h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card bg-dark text-white">
+        <div class="card-body">
+          <h5 class="card-title">Profile</h5>
+          <p><strong>Email:</strong> <%= user && user.email ? user.email : '' %></p>
+          <p><strong>Phone:</strong> <%= user && user.phone ? user.phone : '' %></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-dark text-white">
+        <div class="card-body">
+          <h5 class="card-title">Upcoming Meetings</h5>
+          <% if (meetings && meetings.length > 0) { %>
+            <ul class="list-group list-group-flush">
+              <% meetings.forEach(function(meeting) { %>
+                <li class="list-group-item bg-dark text-white">
+                  <strong><%= meeting.title %></strong><br>
+                  <span><%= new Date(meeting.startTime).toLocaleString() %></span>
+                </li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p>No upcoming meetings.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-dark text-white">
+        <div class="card-body">
+          <h5 class="card-title">Recent Payments</h5>
+          <% if (payments && payments.length > 0) { %>
+            <ul class="list-group list-group-flush">
+              <% payments.forEach(function(payment) { %>
+                <li class="list-group-item bg-dark text-white">
+                  <strong>₹<%= payment.amount %></strong> - <%= payment.status %><br>
+                  <span><%= new Date(payment.createdAt).toLocaleDateString() %></span>
+                </li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p>No recent payments.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fittese - User Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0b3d2e;
+            --secondary-color: #3e9278;
+            --accent-color: #f8b500;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(11, 61, 46, 0.3);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .meeting-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .error-message {
+            display: none;
+            color: #dc3545;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-heart-pulse me-2"></i>Fittese
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="showDashboard()">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showBookMeeting()">Book Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showMyMeetings()">My Meetings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showProfile()">Profile</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>Account
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showProfile()">Profile</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showPayments()">Payments</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/user/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="errorText">An error occurred</span>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent">
+            <!-- Welcome Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="mb-2">Welcome back, <span id="userName">User</span>!</h4>
+                            <p class="text-muted mb-0">Here's your health consultation dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h3 id="totalMeetings">0</h3>
+                        <p class="text-muted mb-0">Total Meetings</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <h3 id="upcomingMeetings">0</h3>
+                        <p class="text-muted mb-0">Upcoming</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <h3 id="completedMeetings">0</h3>
+                        <p class="text-muted mb-0">Completed</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <h3 id="totalPayments">0</h3>
+                        <p class="text-muted mb-0">Payments</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-3">
+                                <button class="btn btn-primary" onclick="showBookMeeting()">
+                                    <i class="bi bi-calendar-plus me-2"></i>Book New Meeting
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="showMyMeetings()">
+                                    <i class="bi bi-calendar3 me-2"></i>View My Meetings
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="showProfile()">
+                                    <i class="bi bi-person me-2"></i>Update Profile
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="showPayments()">
+                                    <i class="bi bi-credit-card me-2"></i>View Payments
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Meetings -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Meetings</h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary" onclick="showMyMeetings()">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="recentMeetingsList">
+                                <!-- Recent meetings will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Employees -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Available Health Consultants</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="employeesList" class="row">
+                                <!-- Employees will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Meeting Content -->
+        <div id="bookMeetingContent" style="display: none;">
+            <!-- Book meeting form will be loaded here -->
+        </div>
+
+        <!-- My Meetings Content -->
+        <div id="myMeetingsContent" style="display: none;">
+            <!-- My meetings will be loaded here -->
+        </div>
+
+        <!-- Profile Content -->
+        <div id="profileContent" style="display: none;">
+            <!-- Profile form will be loaded here -->
+        </div>
+
+        <!-- Payments Content -->
+        <div id="paymentsContent" style="display: none;">
+            <!-- Payments will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global variables
+        let currentUser = null;
+        let userMeetings = [];
+        let userPayments = [];
+        let availableEmployees = [];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+        });
+
+        // Load dashboard data
+        async function loadDashboard() {
+            showLoading();
+            try {
+                const response = await fetch('/user/dashboard/api', { credentials: 'include' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.data.user;
+                    userMeetings = data.data.meetings;
+                    userPayments = data.data.payments;
+                    availableEmployees = data.data.employees;
+                    
+                    updateDashboard();
+                } else {
+                    showError(data.message || 'Failed to load dashboard');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+            hideLoading();
+        }
+
+        // Update dashboard display
+        function updateDashboard() {
+            // Update user name
+            document.getElementById('userName').textContent = currentUser?.name || 'User';
+            
+            // Update stats
+            document.getElementById('totalMeetings').textContent = userMeetings.length;
+            document.getElementById('upcomingMeetings').textContent = userMeetings.filter(m => m.status === 'scheduled').length;
+            document.getElementById('completedMeetings').textContent = userMeetings.filter(m => m.status === 'completed').length;
+            document.getElementById('totalPayments').textContent = userPayments.length;
+            
+            // Update recent meetings
+            updateRecentMeetings();
+            
+            // Update employees
+            updateEmployeesList();
+        }
+
+        // Update recent meetings list
+        function updateRecentMeetings() {
+            const container = document.getElementById('recentMeetingsList');
+            const recentMeetings = userMeetings.slice(0, 5);
+            
+            if (recentMeetings.length === 0) {
+                container.innerHTML = '<div class="p-4 text-center text-muted">No meetings found</div>';
+                return;
+            }
+            
+            container.innerHTML = recentMeetings.map(meeting => `
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <div>
+                        <h6 class="mb-1">${meeting.title}</h6>
+                        <small class="text-muted">
+                            ${meeting.employee?.name || 'Unknown'} • 
+                            ${new Date(meeting.startTime).toLocaleDateString()} at 
+                            ${new Date(meeting.startTime).toLocaleTimeString()}
+                        </small>
+                    </div>
+                    <div>
+                        <span class="badge bg-${getStatusColor(meeting.status)}">${meeting.status}</span>
+                        ${meeting.videoLink ? `<a href="${meeting.videoLink}" class="btn btn-sm btn-primary ms-2">Join</a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update employees list
+        function updateEmployeesList() {
+            const container = document.getElementById('employeesList');
+            
+            if (availableEmployees.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center text-muted">No employees available</div>';
+                return;
+            }
+            
+            container.innerHTML = availableEmployees.map(employee => `
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            </div>
+                            <h6 class="card-title">${employee.name}</h6>
+                            <p class="card-text text-muted">${employee.employeetype?.name || 'Health Consultant'}</p>
+                            <button class="btn btn-sm btn-primary" onclick="bookWithEmployee('${employee._id}')">
+                                Book Meeting
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Navigation functions
+        function showDashboard() {
+            hideAllContent();
+            document.getElementById('dashboardContent').style.display = 'block';
+            loadDashboard();
+        }
+
+        function showBookMeeting() {
+            hideAllContent();
+            document.getElementById('bookMeetingContent').style.display = 'block';
+            loadBookMeetingForm();
+        }
+
+        function showMyMeetings() {
+            hideAllContent();
+            document.getElementById('myMeetingsContent').style.display = 'block';
+            loadMyMeetings();
+        }
+
+        function showProfile() {
+            hideAllContent();
+            document.getElementById('profileContent').style.display = 'block';
+            loadProfileForm();
+        }
+
+        function showPayments() {
+            hideAllContent();
+            document.getElementById('paymentsContent').style.display = 'block';
+            loadPayments();
+        }
+
+        // Utility functions
+        function hideAllContent() {
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('bookMeetingContent').style.display = 'none';
+            document.getElementById('myMeetingsContent').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('paymentsContent').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'scheduled': return 'primary';
+                case 'completed': return 'success';
+                case 'cancelled': return 'danger';
+                default: return 'secondary';
+            }
+        }
+
+        function bookWithEmployee(employeeId) {
+            showBookMeeting();
+            // Pre-select the employee
+            setTimeout(() => {
+                const employeeSelect = document.getElementById('employeeSelect');
+                if (employeeSelect) {
+                    employeeSelect.value = employeeId;
+                    employeeSelect.dispatchEvent(new Event('change'));
+                }
+            }, 100);
+        }
+
+        // Placeholder functions for other sections
+        function loadBookMeetingForm() {
+            document.getElementById('bookMeetingContent').innerHTML = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Book a Meeting</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Meeting booking form will be loaded here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadMyMeetings() {
+            document.getElementById('myMeetingsContent').innerHTML = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">My Meetings</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">My meetings list will be loaded here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadProfileForm() {
+            document.getElementById('profileContent').innerHTML = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">My Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Profile form will be loaded here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadPayments() {
+            document.getElementById('paymentsContent').innerHTML = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">My Payments</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">Payments list will be loaded here...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 

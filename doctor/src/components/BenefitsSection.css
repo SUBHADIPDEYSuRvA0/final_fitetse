@@ -1,0 +1,89 @@
+.benefits-section {
+    background-color: #fff;
+    background-image: url('/benefits.jpg'); /* <-- Update with correct path */
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 580px;
+    padding: 4rem 2rem;
+  }
+  
+  .benefits-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .benefits-header {
+    text-align: left;
+    margin-bottom: 3rem;
+  }
+  
+  .benefits-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0b3d2e;
+    margin-bottom: 0.5rem;
+  }
+  
+  .benefits-header p {
+    font-size: 1rem;
+    color: black;
+    max-width: 500px;
+  }
+  
+  .benefits-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: end;
+  }
+  
+  .benefit-card {
+    flex: 0 0 calc(33.333% - 1.33rem); /* 3 cards per row */
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+  }
+  
+  .benefit-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .benefit-icon {
+    margin-bottom: 1rem;
+  }
+  
+  .benefit-card h3 {
+    font-size: 1.2rem;
+    color: black;
+    margin-bottom: 0.5rem;
+  }
+  
+  .benefit-card p {
+    font-size: 0.95rem;
+    color: black;
+  }
+  
+  /* Responsive */
+  @media (max-width: 992px) {
+    .benefit-card {
+      flex: 0 0 calc(50% - 1rem); /* 2 cards per row on tablets */
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .benefits-cards {
+      justify-content: center;
+    }
+    .benefit-card {
+      flex: 0 0 100%; /* 1 card per row on mobile */
+    }
+  
+    .benefits-header {
+      text-align: center;
+    }
+  }
+  

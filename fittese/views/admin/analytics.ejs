@@ -1,0 +1,906 @@
+<%- include('partials/header') %>
+
+<div class="container-fluid">
+  <div class="row">
+    <%- include('partials/navbar') %>
+    
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+          <i class="bi bi-graph-up"></i> Analytics Dashboard
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+              <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="exportBtn">
+              <i class="bi bi-download"></i> Export
+            </button>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown">
+              <i class="bi bi-calendar"></i> Last 30 Days
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-range="7">Last 7 Days</a></li>
+              <li><a class="dropdown-item" href="#" data-range="30">Last 30 Days</a></li>
+              <li><a class="dropdown-item" href="#" data-range="90">Last 90 Days</a></li>
+              <li><a class="dropdown-item" href="#" data-range="365">Last Year</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-time Stats -->
+      <div class="row mb-4" id="realTimeStats">
+        <div class="col-md-3">
+          <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    Active Users
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="activeUsers">-</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                    Active Meetings
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="activeMeetings">-</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-camera-video-fill fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                    Recent Payments
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="recentPayments">-</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-credit-card-fill fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                    Recent Recordings
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="recentRecordings">-</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-record-circle-fill fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    Total Users
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalUsers">-</div>
+                  <div class="text-xs text-muted" id="newUsers">+0 new this month</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-people fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                    Total Revenue
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalRevenue">₹-</div>
+                  <div class="text-xs text-muted" id="revenueGrowth">+0% this month</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-currency-rupee fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                    Total Meetings
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalMeetings">-</div>
+                  <div class="text-xs text-muted" id="avgDuration">Avg: 0 min</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-calendar-check fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+          <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+              <div class="row no-gutters align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                    Total Recordings
+                  </div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalRecordings">-</div>
+                  <div class="text-xs text-muted" id="totalDuration">Total: 0 hours</div>
+                </div>
+                <div class="col-auto">
+                  <i class="bi bi-camera-video fa-2x text-gray-300"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row mb-4">
+        <!-- Revenue Chart -->
+        <div class="col-xl-8 col-lg-7">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+              <h6 class="m-0 font-weight-bold text-primary">Revenue Overview</h6>
+              <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                  <a class="dropdown-item" href="#" onclick="exportChart('revenueChart')">Export</a>
+                  <a class="dropdown-item" href="#" onclick="printChart('revenueChart')">Print</a>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <canvas id="revenueChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Growth Chart -->
+        <div class="col-xl-4 col-lg-5">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+              <h6 class="m-0 font-weight-bold text-primary">User Growth</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="userGrowthChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- More Charts Row -->
+      <div class="row mb-4">
+        <!-- Meeting Statistics -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Meeting Statistics</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="meetingChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Payment Methods</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="paymentMethodChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recording Analytics -->
+      <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Recording Analytics</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="recordingChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Popularity -->
+        <div class="col-xl-4 col-lg-5">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Plan Popularity</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="planChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Performers -->
+      <div class="row mb-4">
+        <!-- Top Users -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Top Users</h6>
+            </div>
+            <div class="card-body">
+              <div id="topUsersList">
+                <div class="text-center py-3">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Recordings -->
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Top Recordings</h6>
+            </div>
+            <div class="card-body">
+              <div id="topRecordingsList">
+                <div class="text-center py-3">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Analytics -->
+      <div class="row mb-4">
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Questions by Category</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="questionCategoryChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Questions by Difficulty</h6>
+            </div>
+            <div class="card-body">
+              <canvas id="questionDifficultyChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+let charts = {};
+let currentTimeRange = 30;
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadAnalytics();
+  loadRealTimeStats();
+  
+  // Auto-refresh real-time stats every 30 seconds
+  setInterval(loadRealTimeStats, 30000);
+  
+  // Setup event listeners
+  document.getElementById('refreshBtn').addEventListener('click', loadAnalytics);
+  document.getElementById('exportBtn').addEventListener('click', exportAnalytics);
+  
+  // Time range dropdown
+  document.querySelectorAll('[data-range]').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      currentTimeRange = parseInt(this.dataset.range);
+      document.getElementById('timeRangeDropdown').textContent = this.textContent;
+      loadAnalytics();
+    });
+  });
+});
+
+async function loadAnalytics() {
+  try {
+    const response = await fetch('/admin/analytics');
+    const data = await response.json();
+    
+    if (data.success) {
+      updateOverviewCards(data.data.overview, data.data);
+      createCharts(data.data);
+      updateTopPerformers(data.data);
+    }
+  } catch (error) {
+    console.error('Error loading analytics:', error);
+  }
+}
+
+async function loadRealTimeStats() {
+  try {
+    const response = await fetch('/admin/analytics/realtime');
+    const data = await response.json();
+    
+    if (data.success) {
+      document.getElementById('activeUsers').textContent = data.data.activeUsers;
+      document.getElementById('activeMeetings').textContent = data.data.activeMeetings;
+      document.getElementById('recentPayments').textContent = data.data.recentPayments;
+      document.getElementById('recentRecordings').textContent = data.data.recentRecordings;
+    }
+  } catch (error) {
+    console.error('Error loading real-time stats:', error);
+  }
+}
+
+function updateOverviewCards(overview, fullData) {
+  document.getElementById('totalUsers').textContent = overview.totalUsers;
+  document.getElementById('totalRevenue').textContent = `₹${overview.totalRevenue?.toLocaleString() || 0}`;
+  document.getElementById('totalMeetings').textContent = overview.totalMeetings;
+  document.getElementById('totalRecordings').textContent = overview.totalRecordings;
+  
+  // Update sub-texts
+  document.getElementById('newUsers').textContent = `+${fullData.users.newUsers} new this month`;
+  document.getElementById('revenueGrowth').textContent = `${fullData.revenue.growth.toFixed(1)}% this month`;
+  document.getElementById('avgDuration').textContent = `Avg: ${Math.round(fullData.meetings.duration.avgDuration || 0)} min`;
+  document.getElementById('totalDuration').textContent = `Total: ${Math.round((fullData.recordings.totalDuration.totalDuration || 0) / 3600)} hours`;
+}
+
+function createCharts(data) {
+  // Revenue Chart
+  createRevenueChart(data.revenue);
+  
+  // User Growth Chart
+  createUserGrowthChart(data.users);
+  
+  // Meeting Chart
+  createMeetingChart(data.meetings);
+  
+  // Payment Method Chart
+  createPaymentMethodChart(data.payments);
+  
+  // Recording Chart
+  createRecordingChart(data.recordings);
+  
+  // Plan Chart
+  createPlanChart(data.plans);
+  
+  // Question Charts
+  createQuestionCategoryChart(data.questions);
+  createQuestionDifficultyChart(data.questions);
+}
+
+function createRevenueChart(revenueData) {
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  
+  if (charts.revenueChart) {
+    charts.revenueChart.destroy();
+  }
+  
+  const labels = revenueData.monthly.map(item => {
+    const [year, month] = item._id.split('-');
+    return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+  });
+  
+  const data = revenueData.monthly.map(item => item.revenue);
+  
+  charts.revenueChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Revenue',
+        data: data,
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Monthly Revenue'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function createUserGrowthChart(userData) {
+  const ctx = document.getElementById('userGrowthChart').getContext('2d');
+  
+  if (charts.userGrowthChart) {
+    charts.userGrowthChart.destroy();
+  }
+  
+  const labels = userData.byMonth.map(item => {
+    const [year, month] = item._id.split('-');
+    return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short' });
+  });
+  
+  const data = userData.byMonth.map(item => item.count);
+  
+  charts.userGrowthChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'New Users',
+        data: data,
+        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'User Registration'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function createMeetingChart(meetingData) {
+  const ctx = document.getElementById('meetingChart').getContext('2d');
+  
+  if (charts.meetingChart) {
+    charts.meetingChart.destroy();
+  }
+  
+  const labels = meetingData.byStatus.map(item => item._id);
+  const data = meetingData.byStatus.map(item => item.count);
+  const colors = ['#28a745', '#ffc107', '#dc3545', '#6c757d'];
+  
+  charts.meetingChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Meetings by Status'
+        }
+      }
+    }
+  });
+}
+
+function createPaymentMethodChart(paymentData) {
+  const ctx = document.getElementById('paymentMethodChart').getContext('2d');
+  
+  if (charts.paymentMethodChart) {
+    charts.paymentMethodChart.destroy();
+  }
+  
+  const labels = paymentData.byMethod.map(item => item._id);
+  const data = paymentData.byMethod.map(item => item.total);
+  const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'];
+  
+  charts.paymentMethodChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Revenue by Payment Method'
+        }
+      }
+    }
+  });
+}
+
+function createRecordingChart(recordingData) {
+  const ctx = document.getElementById('recordingChart').getContext('2d');
+  
+  if (charts.recordingChart) {
+    charts.recordingChart.destroy();
+  }
+  
+  const labels = recordingData.byWeek.map(item => `Week ${item._id}`);
+  const data = recordingData.byWeek.map(item => item.count);
+  
+  charts.recordingChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Recordings',
+        data: data,
+        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Recordings by Week'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function createPlanChart(planData) {
+  const ctx = document.getElementById('planChart').getContext('2d');
+  
+  if (charts.planChart) {
+    charts.planChart.destroy();
+  }
+  
+  const labels = planData.byPopularity.map(item => item._id);
+  const data = planData.byPopularity.map(item => item.count);
+  const colors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d'];
+  
+  charts.planChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Plan Popularity'
+        }
+      }
+    }
+  });
+}
+
+function createQuestionCategoryChart(questionData) {
+  const ctx = document.getElementById('questionCategoryChart').getContext('2d');
+  
+  if (charts.questionCategoryChart) {
+    charts.questionCategoryChart.destroy();
+  }
+  
+  const labels = questionData.byCategory.map(item => item._id);
+  const data = questionData.byCategory.map(item => item.count);
+  
+  charts.questionCategoryChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Questions',
+        data: data,
+        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Questions by Category'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+function createQuestionDifficultyChart(questionData) {
+  const ctx = document.getElementById('questionDifficultyChart').getContext('2d');
+  
+  if (charts.questionDifficultyChart) {
+    charts.questionDifficultyChart.destroy();
+  }
+  
+  const labels = questionData.byDifficulty.map(item => item._id);
+  const data = questionData.byDifficulty.map(item => item.count);
+  const colors = ['#28a745', '#ffc107', '#dc3545'];
+  
+  charts.questionDifficultyChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Questions by Difficulty'
+        }
+      }
+    }
+  });
+}
+
+function updateTopPerformers(data) {
+  // Update top users
+  const topUsersList = document.getElementById('topUsersList');
+  topUsersList.innerHTML = data.users.topUsers.map((user, index) => `
+    <div class="d-flex align-items-center mb-3">
+      <div class="flex-shrink-0">
+        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+          <span class="text-white font-weight-bold">${index + 1}</span>
+        </div>
+      </div>
+      <div class="flex-grow-1 ms-3">
+        <h6 class="mb-0">${user.name}</h6>
+        <small class="text-muted">${user.email} • ${user.meetingCount} meetings</small>
+      </div>
+      <div class="flex-shrink-0">
+        <span class="badge bg-primary">${user.role}</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Update top recordings
+  const topRecordingsList = document.getElementById('topRecordingsList');
+  topRecordingsList.innerHTML = data.recordings.topRecordings.map((recording, index) => `
+    <div class="d-flex align-items-center mb-3">
+      <div class="flex-shrink-0">
+        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+          <span class="text-white font-weight-bold">${index + 1}</span>
+        </div>
+      </div>
+      <div class="flex-grow-1 ms-3">
+        <h6 class="mb-0">${recording.title}</h6>
+        <small class="text-muted">${recording.analytics.views} views • ${recording.analytics.downloads} downloads</small>
+      </div>
+      <div class="flex-shrink-0">
+        <span class="badge bg-success">${Math.round(recording.recordingInfo.duration / 60)} min</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function exportAnalytics() {
+  // Create a combined chart image
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200;
+  canvas.height = 800;
+  const ctx = canvas.getContext('2d');
+  
+  // Export as image
+  const link = document.createElement('a');
+  link.download = `analytics-${new Date().toISOString().split('T')[0]}.png`;
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function exportChart(chartId) {
+  const chart = charts[chartId];
+  if (chart) {
+    const link = document.createElement('a');
+    link.download = `${chartId}-${new Date().toISOString().split('T')[0]}.png`;
+    link.href = chart.toBase64Image();
+    link.click();
+  }
+}
+
+function printChart(chartId) {
+  const chart = charts[chartId];
+  if (chart) {
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head><title>Chart Print</title></head>
+        <body>
+          <img src="${chart.toBase64Image()}" style="width: 100%; height: auto;">
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  }
+}
+</script>
+
+<style>
+.border-left-primary {
+  border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+  border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-info {
+  border-left: 0.25rem solid #36b9cc !important;
+}
+
+.border-left-warning {
+  border-left: 0.25rem solid #f6c23e !important;
+}
+
+.text-xs {
+  font-size: 0.7rem;
+}
+
+.text-gray-300 {
+  color: #dddfeb !important;
+}
+
+.text-gray-800 {
+  color: #5a5c69 !important;
+}
+
+.font-weight-bold {
+  font-weight: 700 !important;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+}
+
+.card-header {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0;
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+}
+
+.shadow {
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+/* Animation for real-time updates */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.real-time-update {
+  animation: pulse 0.5s ease-in-out;
+}
+</style>
+
+<%- include('partials/footer') %> 

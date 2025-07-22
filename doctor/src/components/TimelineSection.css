@@ -1,0 +1,122 @@
+.timeline-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.timeline-display{
+  width: 100%;
+  max-width: 512px;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: end;
+
+}
+.timeline-display img {
+  max-height: 400px;
+  align-self: center;
+  display: flex;
+  width: 100%;
+  margin: 15px 0;
+}
+.timeline-container {
+  position: relative;
+  width: 50%;
+  /* margin: 0 auto; */
+  padding: 50px 15px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.timeline-img {
+  display: flex;
+}
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: #f89d52;
+}
+
+.timeline-item {
+  position: relative;
+  width: 50%;
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+
+.timeline-item.left {
+  left: 0;
+  text-align: right;
+}
+
+.timeline-item.right {
+  left: 50%;
+  text-align: left;
+}
+
+.timeline-heart {
+  position: absolute;
+  top: 20px;
+  width: 30px;
+  height: 30px;
+  background: white;
+  border: 2px solid #f89d52;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.timeline-item.left .timeline-heart {
+  right: -10px;
+}
+
+.timeline-item.right .timeline-heart {
+  left: -10px;
+}
+
+.timeline-content {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* -------------------- Responsive Styles -------------------- */
+@media (max-width: 768px) {
+  .timeline-container {
+    width: 90%;
+    padding: 30px 0;
+  }
+
+  .timeline-line {
+    left: 20px;
+    transform: none;
+  }
+
+  .timeline-item {
+    width: 100%;
+    padding-left: 50px;
+    padding-right: 20px;
+    margin-bottom: 30px;
+  }
+
+  .timeline-item.left,
+  .timeline-item.right {
+    left: 0;
+    text-align: left;
+  }
+
+  .timeline-item .timeline-heart {
+    left: 10px;
+    right: auto;
+  }
+  .timeline-item.right .timeline-heart {
+    left: 0px;
+  }
+  
+}

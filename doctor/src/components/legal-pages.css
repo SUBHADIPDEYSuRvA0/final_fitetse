@@ -1,0 +1,278 @@
+:root {
+  --primary-color: #0b3d2e;
+  --primary-light: #2d7a7a;
+  --primary-dark: #0f4c4c;
+  --accent-color: #ff8c42;
+  --accent-hover: #e6753a;
+  --background-gradient: linear-gradient(135deg, #f0fdfa 0%, white 100%);
+  --underweight-color: #3498db;
+  --normal-color: #2ecc71;
+  --overweight-color: #f1c40f;
+  --obese-color: #e67e22;
+  --morbidly-obese-color: #e74c3c;
+  --bmi-category-color: #cccccc;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --border-color: #e5e7eb;
+  --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background-color);
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Header Styles */
+.legal-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 3rem 0;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.legal-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.legal-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  text-decoration: none;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.back-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Content Styles */
+.legal-content {
+  background: var(--card-background);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.section-content {
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.section-content p {
+  margin-bottom: 1rem;
+}
+
+.section-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.section-content li {
+  margin-bottom: 0.5rem;
+}
+
+.section-content strong {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Contact Info Styles */
+.contact-info {
+  background: var(--background-color);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--primary-color);
+  margin-top: 1rem;
+}
+
+.contact-info p {
+  margin-bottom: 0.5rem;
+}
+
+.contact-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* Footer */
+.legal-footer {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Home Page Styles */
+.home-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.home-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.home-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.legal-card {
+  background: var(--card-background);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.legal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(11, 61, 46, 0.15);
+}
+
+.card-icon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--primary-color);
+  margin: 0 auto 1rem;
+}
+
+.card-title {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.card-description {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.card-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.card-button:hover {
+  background: var(--primary-light);
+}
+
+.button-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .legal-header h1,
+  .home-header h1 {
+    font-size: 2rem;
+  }
+
+  .legal-content {
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .legal-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .legal-header,
+  .home-header {
+    padding: 2rem 0;
+  }
+
+  .legal-content {
+    padding: 1rem;
+  }
+}

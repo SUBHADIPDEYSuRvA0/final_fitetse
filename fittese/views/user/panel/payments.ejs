@@ -1,0 +1,21 @@
+<% layout('user/panel/layout', { title: 'Payments', activePage: 'payments', user: user }) %>
+
+<div class="container-fluid">
+  <h2 class="mb-4">Payments</h2>
+  <div class="table-responsive">
+    <table class="table table-dark table-striped">
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Plan</th>
+        </tr>
+      </thead>
+      <tbody id="paymentsTableBody">
+        <!-- Payments will be loaded here by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="/public/js/user-panel/payments.js"></script> 

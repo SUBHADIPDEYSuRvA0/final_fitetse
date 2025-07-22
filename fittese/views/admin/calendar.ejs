@@ -1,0 +1,703 @@
+<%- include('partials/header.ejs') %>
+
+<!-- Page Content -->
+<div id="content">
+    <!-- Top Navbar -->
+    <%- include('partials/navbar.ejs') %>
+
+    <!-- Calendar Content -->
+    <div class="container-fluid py-4 px-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1">Calendar & Slot Management</h2>
+                <p class="text-muted">Manage time slots and calendar availability</p>
+            </div>
+        </div>
+
+        <!-- Slot Generation Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Generate Time Slots</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="slotGenerationForm">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">From Date</label>
+                                    <input type="date" class="form-control" id="fromDate" required>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">To Date</label>
+                                    <input type="date" class="form-control" id="toDate" required>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="time" class="form-control" id="startTime" required>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">End Time</label>
+                                    <input type="time" class="form-control" id="endTime" required>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">Slots Per Day</label>
+                                    <input type="number" class="form-control" id="slotsPerDay" min="1" max="24" value="8" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Days of Week</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="monday" value="monday" checked>
+                                        <label class="form-check-label" for="monday">Monday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="tuesday" value="tuesday" checked>
+                                        <label class="form-check-label" for="tuesday">Tuesday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="wednesday" value="wednesday" checked>
+                                        <label class="form-check-label" for="wednesday">Wednesday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="thursday" value="thursday" checked>
+                                        <label class="form-check-label" for="thursday">Thursday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="friday" value="friday" checked>
+                                        <label class="form-check-label" for="friday">Friday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="saturday" value="saturday">
+                                        <label class="form-check-label" for="saturday">Saturday</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="sunday" value="sunday">
+                                        <label class="form-check-label" for="sunday">Sunday</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-calendar-plus"></i> Generate Slots
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Calendar View</h5>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" id="monthView">Month</button>
+                            <button type="button" class="btn btn-outline-primary" id="weekView">Week</button>
+                            <button type="button" class="btn btn-outline-primary" id="dayView">Day</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slots List -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Available Slots</h5>
+                        <button class="btn btn-outline-danger" onclick="deleteAllSlots()">
+                            <i class="bi bi-trash"></i> Delete All
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Booked By</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="slotsTableBody">
+                                    <!-- Slots will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateStatusModalLabel">
+                    <i class="bi bi-pencil-square"></i> Update Slot Status
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStatusForm">
+                    <input type="hidden" id="updateSlotId" name="slotId">
+                    <div class="mb-3">
+                        <label for="slotStatus" class="form-label">Status</label>
+                        <select class="form-select" id="slotStatus" name="status" required>
+                            <option value="available">Available</option>
+                            <option value="booked">Booked</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="completed">Completed</option>
+                            <option value="rescheduled">Rescheduled</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="statusNotes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="statusNotes" name="notes" rows="3" placeholder="Add any notes about the status change..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateSlotStatus()">
+                    <i class="bi bi-check-circle"></i> Update Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reschedule Modal -->
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rescheduleModalLabel">
+                    <i class="bi bi-calendar-event"></i> Reschedule Slot
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rescheduleForm">
+                    <input type="hidden" id="rescheduleSlotId" name="slotId">
+                    <div class="mb-3">
+                        <label for="newDate" class="form-label">New Date</label>
+                        <input type="date" class="form-control" id="newDate" name="newDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newStartTime" class="form-label">New Start Time</label>
+                        <input type="time" class="form-control" id="newStartTime" name="newStartTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newEndTime" class="form-label">New End Time</label>
+                        <input type="time" class="form-control" id="newEndTime" name="newEndTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rescheduleReason" class="form-label">Reason for Reschedule</label>
+                        <textarea class="form-control" id="rescheduleReason" name="reason" rows="3" placeholder="Please provide a reason for rescheduling..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyUser" name="notifyUser" checked>
+                            <label class="form-check-label" for="notifyUser">
+                                Notify user about the reschedule
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="rescheduleSlot()">
+                    <i class="bi bi-calendar-check"></i> Reschedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slot Details Modal -->
+<div class="modal fade" id="slotDetailsModal" tabindex="-1" aria-labelledby="slotDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="slotDetailsModalLabel">
+                    <i class="bi bi-info-circle"></i> Slot Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="slotDetailsContent">
+                <!-- Slot details will be loaded here -->
+            </div>
+            <div class="modal-footer" id="slotDetailsActions">
+                <!-- Action buttons will be injected here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reschedule Modal (for slot details) -->
+<div class="modal fade" id="rescheduleSlotModal" tabindex="-1" aria-labelledby="rescheduleSlotModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rescheduleSlotModalLabel">
+                    <i class="bi bi-calendar-event"></i> Reschedule Slot
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="rescheduleSlotForm">
+                    <input type="hidden" id="rescheduleSlotId2" name="slotId">
+                    <div class="mb-3">
+                        <label for="newDate2" class="form-label">New Date</label>
+                        <input type="date" class="form-control" id="newDate2" name="newDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newStartTime2" class="form-label">New Start Time</label>
+                        <input type="time" class="form-control" id="newStartTime2" name="newStartTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newEndTime2" class="form-label">New End Time</label>
+                        <input type="time" class="form-control" id="newEndTime2" name="newEndTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="rescheduleReason2" class="form-label">Reason for Reschedule</label>
+                        <textarea class="form-control" id="rescheduleReason2" name="reason" rows="3" placeholder="Please provide a reason for rescheduling..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitRescheduleSlot()">
+                    <i class="bi bi-calendar-check"></i> Reschedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize calendar
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: '/admin/slots',
+        eventClick: function(info) {
+            console.log('Event clicked:', info.event);
+        }
+    });
+    calendar.render();
+
+    // Load slots
+    loadSlots();
+
+    // Slot generation form
+    document.getElementById('slotGenerationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        generateSlots();
+    });
+});
+
+function loadSlots() {
+    fetch('/admin/slots', { credentials: 'include' })
+        .then(res => res.json())
+        .then(slots => {
+            const tbody = document.getElementById('slotsTableBody');
+            tbody.innerHTML = '';
+            
+            slots.forEach(slot => {
+                const row = document.createElement('tr');
+                const statusBadgeClass = getStatusBadgeClass(slot.status);
+                const bookedBy = slot.bookedBy ? slot.bookedBy.name || slot.bookedBy.email : '—';
+                
+                row.innerHTML = `
+                    <td>${new Date(slot.start).toLocaleDateString()}</td>
+                    <td>${new Date(slot.start).toLocaleTimeString()} - ${new Date(slot.end).toLocaleTimeString()}</td>
+                    <td>
+                        <span class="badge ${statusBadgeClass}">${slot.status}</span>
+                    </td>
+                    <td>${bookedBy}</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-outline-info" onclick="viewSlotDetails('${slot._id}')" title="View Details">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openUpdateStatusModal('${slot._id}', '${slot.status}')" title="Update Status">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="openRescheduleModal('${slot._id}')" title="Reschedule">
+                                <i class="bi bi-calendar-event"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSlot('${slot._id}')" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+            console.error('Error loading slots:', err);
+        });
+}
+
+function generateSlots() {
+    const formData = {
+        fromDate: document.getElementById('fromDate').value,
+        toDate: document.getElementById('toDate').value,
+        startTime: document.getElementById('startTime').value,
+        endTime: document.getElementById('endTime').value,
+        slotsPerDay: document.getElementById('slotsPerDay').value,
+        dayOfWeek: getSelectedDays()
+    };
+
+    fetch('/admin/slots/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData),
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Slots generated successfully!');
+            loadSlots();
+        } else {
+            alert('Error generating slots: ' + data.message);
+        }
+    })
+    .catch(err => {
+        console.error('Error generating slots:', err);
+        alert('Error generating slots');
+    });
+}
+
+function getSelectedDays() {
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    return days.filter(day => document.getElementById(day).checked);
+}
+
+function deleteSlot(slotId) {
+    if (confirm('Are you sure you want to delete this slot?')) {
+        fetch(`/admin/slots/${slotId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadSlots();
+            } else {
+                alert('Error deleting slot');
+            }
+        })
+        .catch(err => {
+            console.error('Error deleting slot:', err);
+        });
+    }
+}
+
+function deleteAllSlots() {
+    if (confirm('Are you sure you want to delete ALL slots? This action cannot be undone.')) {
+        fetch('/admin/slots/delete-all', {
+            method: 'DELETE',
+            credentials: 'include'
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                loadSlots();
+            } else {
+                alert('Error deleting slots');
+            }
+        })
+        .catch(err => {
+            console.error('Error deleting slots:', err);
+        });
+    }
+}
+
+function getStatusBadgeClass(status) {
+    switch(status) {
+        case 'available': return 'bg-success';
+        case 'booked': return 'bg-primary';
+        case 'cancelled': return 'bg-danger';
+        case 'completed': return 'bg-success';
+        case 'rescheduled': return 'bg-warning';
+        default: return 'bg-secondary';
+    }
+}
+
+function openUpdateStatusModal(slotId, currentStatus) {
+    document.getElementById('updateSlotId').value = slotId;
+    document.getElementById('slotStatus').value = currentStatus;
+    document.getElementById('statusNotes').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+    modal.show();
+}
+
+function updateSlotStatus() {
+    const slotId = document.getElementById('updateSlotId').value;
+    const status = document.getElementById('slotStatus').value;
+    const notes = document.getElementById('statusNotes').value;
+    
+    fetch(`/admin/slots/${slotId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status, notes }),
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
+            loadSlots();
+            showAlert('Status updated successfully!', 'success');
+        } else {
+            showAlert('Error updating status: ' + data.message, 'danger');
+        }
+    })
+    .catch(err => {
+        console.error('Error updating status:', err);
+        showAlert('Error updating status', 'danger');
+    });
+}
+
+function openRescheduleModal(slotId) {
+    document.getElementById('rescheduleSlotId').value = slotId;
+    document.getElementById('newDate').value = '';
+    document.getElementById('newStartTime').value = '';
+    document.getElementById('newEndTime').value = '';
+    document.getElementById('rescheduleReason').value = '';
+    document.getElementById('notifyUser').checked = true;
+    
+    const modal = new bootstrap.Modal(document.getElementById('rescheduleModal'));
+    modal.show();
+}
+
+function rescheduleSlot() {
+    const slotId = document.getElementById('rescheduleSlotId').value;
+    const newDate = document.getElementById('newDate').value;
+    const newStartTime = document.getElementById('newStartTime').value;
+    const newEndTime = document.getElementById('newEndTime').value;
+    const reason = document.getElementById('rescheduleReason').value;
+    const notifyUser = document.getElementById('notifyUser').checked;
+    
+    if (!newDate || !newStartTime || !newEndTime || !reason) {
+        showAlert('Please fill in all required fields', 'warning');
+        return;
+    }
+    
+    fetch(`/admin/slots/${slotId}/reschedule`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            newDate, 
+            newStartTime, 
+            newEndTime, 
+            reason, 
+            notifyUser 
+        }),
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('rescheduleModal')).hide();
+            loadSlots();
+            showAlert('Slot rescheduled successfully!', 'success');
+        } else {
+            showAlert('Error rescheduling slot: ' + data.message, 'danger');
+        }
+    })
+    .catch(err => {
+        console.error('Error rescheduling slot:', err);
+        showAlert('Error rescheduling slot', 'danger');
+    });
+}
+
+function viewSlotDetails(slotId) {
+    fetch(`/admin/slots/${slotId}`, { credentials: 'include' })
+        .then(res => res.json())
+        .then(result => {
+            const slot = result.success ? result.slot : result;
+            const content = document.getElementById('slotDetailsContent');
+            const actions = document.getElementById('slotDetailsActions');
+            const bookedBy = slot.bookedBy ? `
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Booked By:</strong></div>
+                    <div class="col-md-8">${slot.bookedBy.name || 'N/A'} (${slot.bookedBy.email || 'N/A'})</div>
+                </div>
+            ` : '';
+            const meetingInfo = slot.meetingId ? `
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Meeting ID:</strong></div>
+                    <div class="col-md-8">${slot.meetingId}</div>
+                </div>
+            ` : '';
+            content.innerHTML = `
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Date:</strong></div>
+                    <div class="col-md-8">${new Date(slot.start).toLocaleDateString()}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Time:</strong></div>
+                    <div class="col-md-8">${new Date(slot.start).toLocaleTimeString()} - ${new Date(slot.end).toLocaleTimeString()}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Status:</strong></div>
+                    <div class="col-md-8"><span class="badge ${getStatusBadgeClass(slot.status)}">${slot.status}</span></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Duration:</strong></div>
+                    <div class="col-md-8">${slot.duration || 'N/A'} minutes</div>
+                </div>
+                ${bookedBy}
+                ${meetingInfo}
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Created:</strong></div>
+                    <div class="col-md-8">${new Date(slot.createdAt).toLocaleString()}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Updated:</strong></div>
+                    <div class="col-md-8">${new Date(slot.updatedAt).toLocaleString()}</div>
+                </div>
+            `;
+            // Action buttons
+            let actionBtns = '';
+            if (slot.status !== 'cancelled') {
+                actionBtns += `<button class="btn btn-danger me-2" onclick="updateSlotStatusAction('${slot._id}', 'cancelled')"><i class="bi bi-x-circle"></i> Cancel</button>`;
+            }
+            if (slot.status !== 'blocked') {
+                actionBtns += `<button class="btn btn-warning me-2" onclick="updateSlotStatusAction('${slot._id}', 'blocked')"><i class="bi bi-slash-circle"></i> Block</button>`;
+            }
+            if (slot.status === 'blocked') {
+                actionBtns += `<button class="btn btn-success me-2" onclick="updateSlotStatusAction('${slot._id}', 'available')"><i class="bi bi-unlock"></i> Unblock</button>`;
+            }
+            actionBtns += `<button class="btn btn-primary" onclick="openRescheduleSlotModal('${slot._id}')"><i class="bi bi-calendar-event"></i> Reschedule</button>`;
+            actions.innerHTML = actionBtns;
+            const modal = new bootstrap.Modal(document.getElementById('slotDetailsModal'));
+            modal.show();
+        })
+        .catch(err => {
+            console.error('Error loading slot details:', err);
+            showAlert('Error loading slot details', 'danger');
+        });
+}
+
+function updateSlotStatusAction(slotId, status) {
+    fetch(`/admin/slots/${slotId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal')).hide();
+            loadSlots();
+            showAlert('Slot status updated!', 'success');
+        } else {
+            showAlert('Error updating status: ' + data.message, 'danger');
+        }
+    })
+    .catch(err => {
+        showAlert('Error updating status', 'danger');
+    });
+}
+
+function openRescheduleSlotModal(slotId) {
+    document.getElementById('rescheduleSlotId2').value = slotId;
+    document.getElementById('newDate2').value = '';
+    document.getElementById('newStartTime2').value = '';
+    document.getElementById('newEndTime2').value = '';
+    document.getElementById('rescheduleReason2').value = '';
+    const modal = new bootstrap.Modal(document.getElementById('rescheduleSlotModal'));
+    modal.show();
+}
+
+function submitRescheduleSlot() {
+    const slotId = document.getElementById('rescheduleSlotId2').value;
+    const newDate = document.getElementById('newDate2').value;
+    const newStartTime = document.getElementById('newStartTime2').value;
+    const newEndTime = document.getElementById('newEndTime2').value;
+    const reason = document.getElementById('rescheduleReason2').value;
+    if (!newDate || !newStartTime || !newEndTime || !reason) {
+        showAlert('Please fill in all required fields', 'warning');
+        return;
+    }
+    fetch(`/admin/slots/${slotId}/reschedule`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newDate, newStartTime, newEndTime, reason }),
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('rescheduleSlotModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('slotDetailsModal')).hide();
+            loadSlots();
+            showAlert('Slot rescheduled successfully!', 'success');
+        } else {
+            showAlert('Error rescheduling slot: ' + data.message, 'danger');
+        }
+    })
+    .catch(err => {
+        showAlert('Error rescheduling slot', 'danger');
+    });
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>

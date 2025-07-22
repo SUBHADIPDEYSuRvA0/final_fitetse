@@ -1,0 +1,686 @@
+<%- include('partials/header.ejs') %>
+
+<style>
+    .plan-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .plan-header {
+        background: linear-gradient(135deg, #0b3d2e 0%, #3e9278 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .plan-popular {
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    }
+    
+    .popular-badge {
+        position: absolute;
+        top: -10px;
+        right: 20px;
+        background: #ff6b35;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .price-display {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 10px 0;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        opacity: 0.7;
+        font-size: 1.2rem;
+    }
+    
+    .discount-badge {
+        background: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        margin-left: 10px;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin: 8px 0;
+        padding: 8px;
+        border-radius: 8px;
+        background: #f8f9fa;
+    }
+    
+    .feature-item i {
+        margin-right: 10px;
+        color: #28a745;
+    }
+    
+    .feature-item.excluded i {
+        color: #dc3545;
+    }
+    
+    .feature-item.excluded {
+        opacity: 0.6;
+    }
+    
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .form-section h3 {
+        color: #0b3d2e;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
+    
+    .feature-input-group {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #f8f9fa;
+    }
+    
+    .currency-selector {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .currency-selector select {
+        flex: 1;
+    }
+    
+    .currency-selector input {
+        flex: 1;
+    }
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-popular {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+</style>
+
+<div id="content">
+  <%- include('partials/navbar.ejs') %>
+
+  <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="bi bi-credit-card"></i> Plans Management</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPlanModal">
+                <i class="bi bi-plus-circle"></i> Create New Plan
+            </button>
+        </div>
+
+        <!-- Plans Overview -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><%= plans.filter(p => p.isactive).length %></h5>
+                        <p class="card-text">Active Plans</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-success"><%= plans.filter(p => p.isPopular).length %></h5>
+                        <p class="card-text">Popular Plans</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning"><%= plans.filter(p => p.setprice.discount > 0).length %></h5>
+                        <p class="card-text">Discounted Plans</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title text-info"><%= plans.length %></h5>
+                        <p class="card-text">Total Plans</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plans Grid -->
+        <div class="row">
+            <% if (plans && plans.length > 0) { %>
+                <% plans.forEach(function(plan) { %>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="plan-card <%= plan.isPopular ? 'plan-popular' : '' %>" style="position: relative;">
+                            <% if (plan.isPopular) { %>
+                                <div class="popular-badge">Most Popular</div>
+                            <% } %>
+                            
+                            <div class="plan-header">
+                                <h4><%= plan.planname %></h4>
+                                <div class="price-display">
+                                    <% if (plan.setprice.discount > 0) { %>
+                                        <span class="original-price"><%= plan.setprice.currencySymbol %><%= plan.setprice.originalPrice %></span>
+                                        <span class="discount-badge">-<%= plan.setprice.discount %>%</span><br>
+                                    <% } %>
+                                    <%= plan.setprice.currencySymbol %><%= plan.discountedPrice.toFixed(2) %>
+                                </div>
+                                <p class="mb-0"><%= plan.durationDisplay %> • <%= plan.totalsessions %> Sessions</p>
+                            </div>
+                            
+                            <div class="card-body">
+                                <% if (plan.shortDescription) { %>
+                                    <p class="text-muted mb-3"><%= plan.shortDescription %></p>
+                                <% } %>
+                                
+                                <% if (plan.features && plan.features.length > 0) { %>
+                                    <h6>Features:</h6>
+                                    <% plan.features.forEach(function(feature) { %>
+                                        <div class="feature-item <%= !feature.included ? 'excluded' : '' %>">
+                                            <i class="bi <%= feature.icon %>"></i>
+                                            <span><%= feature.name %></span>
+                                        </div>
+                                    <% }) %>
+                                <% } %>
+                                
+                                <div class="mt-3">
+                                    <span class="status-badge <%= plan.isactive ? 'status-active' : 'status-inactive' %>">
+                                        <%= plan.isactive ? 'Active' : 'Inactive' %>
+                                    </span>
+                                    <% if (plan.isPopular) { %>
+                                        <span class="status-badge status-popular">Popular</span>
+                                    <% } %>
+                                </div>
+                                
+                                <div class="mt-3 d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editPlan('<%= plan._id %>')">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="toggleStatus('<%= plan._id %>')">
+                                        <%= plan.isactive ? 'Deactivate' : 'Activate' %>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="togglePopular('<%= plan._id %>')">
+                                        <%= plan.isPopular ? 'Remove Popular' : 'Make Popular' %>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deletePlan('<%= plan._id %>')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-credit-card" style="font-size: 3rem; color: #ccc;"></i>
+                        <h4 class="mt-3 text-muted">No plans found</h4>
+                        <p class="text-muted">Create your first plan to get started.</p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Create Plan Modal -->
+<div class="modal fade" id="createPlanModal" tabindex="-1" aria-labelledby="createPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createPlanModalLabel">Create New Plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createPlanForm">
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h3><i class="bi bi-info-circle"></i> Basic Information</h3>
+                                
+      <div class="mb-3">
+                                    <label class="form-label">Plan Name *</label>
+        <input type="text" name="planname" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+                                    <label class="form-label">Short Description</label>
+                                    <textarea name="shortDescription" class="form-control" rows="2" maxlength="150"></textarea>
+                                    <small class="text-muted">Brief description for display (max 150 characters)</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Full Description *</label>
+                                    <textarea name="description" class="form-control" rows="3" required></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select name="category" class="form-select">
+                                        <option value="basic">Basic</option>
+                                        <option value="premium">Premium</option>
+                                        <option value="enterprise">Enterprise</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pricing -->
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h3><i class="bi bi-currency-dollar"></i> Pricing</h3>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Currency</label>
+                                    <div class="currency-selector">
+                                        <select name="currency" class="form-select" onchange="updateCurrencyDefaults(this.value)">
+                                            <option value="USD">USD - US Dollar</option>
+                                            <option value="EUR">EUR - Euro</option>
+                                            <option value="GBP">GBP - British Pound</option>
+                                            <option value="INR">INR - Indian Rupee</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Currency Code</label>
+                                    <input type="text" name="currencyCode" class="form-control" value="USD" readonly>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Currency Symbol</label>
+                                    <input type="text" name="currencySymbol" class="form-control" value="$" readonly>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Price *</label>
+        <input type="number" name="price" step="0.01" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+                                    <label class="form-label">Original Price (for discount)</label>
+                                    <input type="number" name="originalPrice" step="0.01" class="form-control">
+      </div>
+
+      <div class="mb-3">
+                                    <label class="form-label">Discount (%)</label>
+                                    <input type="number" name="discount" min="0" max="100" step="1" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Duration & Sessions -->
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h3><i class="bi bi-calendar"></i> Duration & Sessions</h3>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Duration *</label>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <input type="number" name="duration" class="form-control" required>
+                                        </div>
+                                        <div class="col-4">
+                                            <select name="durationUnit" class="form-select">
+                                                <option value="days">Days</option>
+                                                <option value="weeks">Weeks</option>
+                                                <option value="months">Months</option>
+                                                <option value="years">Years</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Total Sessions *</label>
+        <input type="number" name="totalsessions" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+                                    <label class="form-label">Max Participants</label>
+                                    <input type="number" name="maxParticipants" class="form-control" value="1" min="1">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Features -->
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h3><i class="bi bi-gear"></i> Additional Features</h3>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="includesRecording" id="includesRecording">
+                                        <label class="form-check-label" for="includesRecording">
+                                            Includes Recording
+                                        </label>
+                                    </div>
+      </div>
+
+      <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="includesSupport" id="includesSupport">
+                                        <label class="form-check-label" for="includesSupport">
+                                            Includes Support
+                                        </label>
+                                    </div>
+      </div>
+
+      <div class="mb-3">
+                                    <label class="form-label">Support Hours</label>
+                                    <input type="text" name="supportHours" class="form-control" value="9 AM - 5 PM">
+      </div>
+
+      <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="isPopular" id="isPopular">
+                                        <label class="form-check-label" for="isPopular">
+                                            Mark as Popular
+                                        </label>
+                                    </div>
+      </div>
+
+      <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="isactive" id="isactive" checked>
+                                        <label class="form-check-label" for="isactive">
+                                            Active Plan
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+      </div>
+                    
+                    <!-- Features Management -->
+                    <div class="form-section">
+                        <h3><i class="bi bi-list-check"></i> Features Management</h3>
+                        <div id="featuresContainer">
+                            <div class="feature-input-group">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Feature Name *</label>
+                                        <input type="text" name="featureNames[]" class="form-control" placeholder="e.g., Video Recording">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="featureDescriptions[]" class="form-control" placeholder="Brief description">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Icon</label>
+                                        <select name="featureIcons[]" class="form-select">
+                                            <option value="bi-check-circle">✓ Check</option>
+                                            <option value="bi-star">★ Star</option>
+                                            <option value="bi-camera-video">📹 Video</option>
+                                            <option value="bi-headphones">🎧 Audio</option>
+                                            <option value="bi-clock">⏰ Time</option>
+                                            <option value="bi-people">👥 Group</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Included</label>
+                                        <select name="featureIncluded[]" class="form-select">
+                                            <option value="true">Yes</option>
+                                            <option value="false">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addFeature()">
+                            <i class="bi bi-plus"></i> Add Feature
+                </button>
+                    </div>
+                    
+                    <!-- Protocols -->
+                    <div class="form-section">
+                        <h3><i class="bi bi-file-text"></i> Protocols</h3>
+                        <div class="mb-3">
+                            <label class="form-label">Protocols (comma-separated) *</label>
+                            <textarea name="protocols" class="form-control" rows="3" placeholder="Enter protocols separated by commas" required></textarea>
+                        </div>
+                    </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createPlan()">Create Plan</button>
+            </div>
+        </div>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let featureCount = 1;
+    
+    function addFeature() {
+        featureCount++;
+        const container = document.getElementById('featuresContainer');
+        const newFeature = document.createElement('div');
+        newFeature.className = 'feature-input-group';
+        newFeature.innerHTML = `
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">Feature Name *</label>
+                    <input type="text" name="featureNames[]" class="form-control" placeholder="e.g., Video Recording">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Description</label>
+                    <input type="text" name="featureDescriptions[]" class="form-control" placeholder="Brief description">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Icon</label>
+                    <select name="featureIcons[]" class="form-select">
+                        <option value="bi-check-circle">✓ Check</option>
+                        <option value="bi-star">★ Star</option>
+                        <option value="bi-camera-video">📹 Video</option>
+                        <option value="bi-headphones">🎧 Audio</option>
+                        <option value="bi-clock">⏰ Time</option>
+                        <option value="bi-people">👥 Group</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">Included</label>
+                    <select name="featureIncluded[]" class="form-select">
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeFeature(this)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(newFeature);
+    }
+    
+    function removeFeature(button) {
+        button.closest('.feature-input-group').remove();
+    }
+    
+    function updateCurrencyDefaults(currency) {
+        const defaults = {
+            'USD': { code: 'USD', symbol: '$' },
+            'EUR': { code: 'EUR', symbol: '€' },
+            'GBP': { code: 'GBP', symbol: '£' },
+            'INR': { code: 'INR', symbol: '₹' }
+        };
+        
+        const defaultValues = defaults[currency] || defaults['USD'];
+        document.querySelector('input[name="currencyCode"]').value = defaultValues.code;
+        document.querySelector('input[name="currencySymbol"]').value = defaultValues.symbol;
+    }
+    
+    function createPlan() {
+        const form = document.getElementById('createPlanForm');
+        const formData = new FormData(form);
+        
+        // Validate required fields
+        const requiredFields = ['planname', 'price', 'duration', 'totalsessions', 'description'];
+        for (let field of requiredFields) {
+            if (!formData.get(field) || formData.get(field).trim() === '') {
+                alert(`Please fill in the required field: ${field}`);
+                return;
+            }
+        }
+        
+        // Validate price
+        const price = parseFloat(formData.get('price'));
+        if (isNaN(price) || price <= 0) {
+            alert('Please enter a valid price (positive number)');
+            return;
+        }
+        
+        // Build features array
+        const featureNames = formData.getAll('featureNames[]');
+        const featureDescriptions = formData.getAll('featureDescriptions[]');
+        const featureIcons = formData.getAll('featureIcons[]');
+        const featureIncluded = formData.getAll('featureIncluded[]');
+        
+        const features = featureNames.map((name, index) => ({
+            name: name,
+            description: featureDescriptions[index] || '',
+            icon: featureIcons[index] || 'bi-check-circle',
+            included: featureIncluded[index] === 'true'
+        })).filter(feature => feature.name.trim() !== '');
+        
+        // Build plan data
+        const planData = {
+            planname: formData.get('planname'),
+            price: formData.get('price'),
+            originalPrice: formData.get('originalPrice'),
+            discount: formData.get('discount'),
+            currency: formData.get('currency'),
+            currencyCode: formData.get('currencyCode'),
+            currencySymbol: formData.get('currencySymbol'),
+            duration: formData.get('duration'),
+            durationUnit: formData.get('durationUnit'),
+            totalsessions: formData.get('totalsessions'),
+            description: formData.get('description'),
+            shortDescription: formData.get('shortDescription'),
+            protocols: formData.get('protocols'),
+            category: formData.get('category'),
+            isactive: formData.get('isactive') === 'on',
+            isPopular: formData.get('isPopular') === 'on',
+            maxParticipants: formData.get('maxParticipants'),
+            includesRecording: formData.get('includesRecording') === 'on',
+            includesSupport: formData.get('includesSupport') === 'on',
+            supportHours: formData.get('supportHours'),
+            features: JSON.stringify(features)
+        };
+        
+        // Show loading state
+        const createButton = document.querySelector('#createPlanModal .btn-primary');
+        const originalText = createButton.innerHTML;
+        createButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+        createButton.disabled = true;
+        
+        // Send to server
+        fetch('/admin/plans/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(planData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Plan created successfully!');
+                location.reload();
+            } else {
+                alert('Error creating plan: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error creating plan: ' + error.message);
+        })
+        .finally(() => {
+            // Reset button state
+            createButton.innerHTML = originalText;
+            createButton.disabled = false;
+        });
+    }
+    
+    function editPlan(planId) {
+        window.location.href = `/admin/plans/edit/${planId}`;
+    }
+    
+    function toggleStatus(planId) {
+        if (confirm('Are you sure you want to change the plan status?')) {
+            window.location.href = `/admin/plans/update-status/${planId}`;
+        }
+    }
+    
+    function togglePopular(planId) {
+        if (confirm('Are you sure you want to change the popular status?')) {
+            window.location.href = `/admin/plans/toggle-popular/${planId}`;
+        }
+    }
+    
+    function deletePlan(planId) {
+        if (confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
+            window.location.href = `/admin/plans/delete/${planId}`;
+        }
+    }
+    
+    // Initialize currency defaults
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCurrencyDefaults('USD');
+  });
+</script>
+
+</body>
+</html>

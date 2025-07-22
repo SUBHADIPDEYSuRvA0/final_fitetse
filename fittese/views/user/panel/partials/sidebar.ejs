@@ -1,0 +1,32 @@
+<ul class="nav flex-column">
+  <li class="nav-item mb-2">
+    <a class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>" href="/user/panel">
+      <i class="bi bi-house"></i> Dashboard
+    </a>
+  </li>
+  <li class="nav-item mb-2">
+    <a class="nav-link <%= activePage === 'book' ? 'active' : '' %>" href="/user/panel/book">
+      <i class="bi bi-calendar-plus"></i> Book Meeting
+    </a>
+  </li>
+  <li class="nav-item mb-2">
+    <a class="nav-link <%= activePage === 'meetings' ? 'active' : '' %>" href="/user/panel/meetings">
+      <i class="bi bi-calendar-event"></i> My Meetings
+    </a>
+  </li>
+  <li class="nav-item mb-2">
+    <a class="nav-link <%= activePage === 'payments' ? 'active' : '' %>" href="/user/panel/payments">
+      <i class="bi bi-credit-card"></i> Payments
+    </a>
+  </li>
+  <li class="nav-item mb-2">
+    <a class="nav-link <%= activePage === 'profile' ? 'active' : '' %>" href="/user/panel/profile">
+      <i class="bi bi-person"></i> Profile
+    </a>
+  </li>
+  <li class="nav-item mt-4">
+    <a class="nav-link text-danger" href="/user/logout">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </li>
+</ul> 

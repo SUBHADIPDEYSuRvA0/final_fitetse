@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Fittese</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .login-body {
+            padding: 40px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .forgot-password:hover {
+            color: #764ba2;
+        }
+        .loading {
+            display: none;
+        }
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <i class="bi bi-shield-lock" style="font-size: 3rem;"></i>
+            <h2 class="mt-3 mb-0">Admin Login</h2>
+            <p class="mb-0 opacity-75">Access your admin dashboard</p>
+        </div>
+        
+        <div class="login-body">
+            <!-- Alert Messages -->
+            <% if (error && error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+            
+            <% if (success && success.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <%= success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">
+                        <i class="bi bi-envelope me-2"></i>Email Address
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock me-2"></i>Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                    <label class="form-check-label" for="rememberMe">
+                        Remember me for 30 days
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-login w-100 mb-3">
+                    <span class="loading">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Signing in...
+                    </span>
+                    <span class="normal">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </span>
+                </button>
+                
+                <div class="text-center">
+                    <a href="#" class="forgot-password" onclick="showForgotPassword()">
+                        <i class="bi bi-question-circle me-1"></i>Forgot Password?
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-key me-2"></i>Reset Password
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Enter your email address and we'll send you a link to reset your password.</p>
+                    <form id="forgotPasswordForm">
+                        <div class="mb-3">
+                            <label for="resetEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="resetEmail" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="sendResetEmail()">
+                        <span class="loading">
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Sending...
+                        </span>
+                        <span class="normal">Send Reset Link</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Login form handling
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const loadingSpan = submitBtn.querySelector('.loading');
+            const normalSpan = submitBtn.querySelector('.normal');
+            
+            // Show loading state
+            loadingSpan.style.display = 'inline';
+            normalSpan.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                const formData = new FormData(form);
+                const data = {
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    rememberMe: formData.get('rememberMe') === 'on'
+                };
+                
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show success message
+                    showAlert('Login successful! Redirecting...', 'success');
+                    
+                    // Store token if provided
+                    if (result.token) {
+                        localStorage.setItem('admin_token', result.token);
+                    }
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1000);
+                } else {
+                    showAlert(result.message || 'Login failed', 'danger');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Network error. Please try again.', 'danger');
+            } finally {
+                // Reset button state
+                loadingSpan.style.display = 'none';
+                normalSpan.style.display = 'inline';
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Show forgot password modal
+        function showForgotPassword() {
+            const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+            modal.show();
+        }
+        
+        // Send reset email
+        async function sendResetEmail() {
+            const email = document.getElementById('resetEmail').value;
+            const btn = document.querySelector('#forgotPasswordModal .btn-primary');
+            const loadingSpan = btn.querySelector('.loading');
+            const normalSpan = btn.querySelector('.normal');
+            
+            if (!email) {
+                showAlert('Please enter your email address', 'danger');
+                return;
+            }
+            
+            // Show loading state
+            loadingSpan.style.display = 'inline';
+            normalSpan.style.display = 'none';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/admin/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert('Reset email sent! Check your inbox.', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
+                } else {
+                    showAlert(result.message || 'Failed to send reset email', 'danger');
+                }
+            } catch (error) {
+                console.error('Reset email error:', error);
+                showAlert('Network error. Please try again.', 'danger');
+            } finally {
+                // Reset button state
+                loadingSpan.style.display = 'none';
+                normalSpan.style.display = 'inline';
+                btn.disabled = false;
+            }
+        }
+        
+        // Show alert message
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const loginBody = document.querySelector('.login-body');
+            loginBody.insertBefore(alertDiv, loginBody.firstChild);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // Auto-focus email field
+        document.getElementById('email').focus();
+    </script>
+</body>
+</html> 

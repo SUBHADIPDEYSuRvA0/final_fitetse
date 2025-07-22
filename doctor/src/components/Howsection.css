@@ -1,0 +1,77 @@
+.how-it-works-container {
+    background-color: #0b3d2e;
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;;
+  }
+  
+  .how-it-works-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 40px;
+  }
+  
+  .steps-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    /* gap: 65px; */
+  }
+  
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  
+  .step-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .step-icon-how {
+    font-size: 2.5rem;
+    color: orange;
+  }
+  
+  .step-label {
+    margin-top: 15px;
+    font-weight: 600;
+    color: white;
+    max-width: 150px;
+  }
+  
+  .step-arrow {
+    position: absolute;
+    right: -67px;
+    top: 49%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .steps-wrapper {
+      flex-direction: column;
+      gap: 30px;
+    }
+  
+    .step-arrow {
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
+      rotate: 90deg;
+      margin-top: 10px;
+    }
+  }
+  

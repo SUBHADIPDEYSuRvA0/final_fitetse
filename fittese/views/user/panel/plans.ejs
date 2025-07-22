@@ -1,0 +1,58 @@
+<div class="container-fluid">
+  <h2 class="mb-4">Available Plans</h2>
+  <!-- Currency selector (global, above plans) -->
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <label for="currency-select" class="form-label">Select Currency</label>
+      <select id="currency-select" class="form-select" name="currency">
+        <option value="USD">$ - US Dollar</option>
+        <option value="INR">₹ - Indian Rupee</option>
+        <option value="EUR">€ - Euro</option>
+        <option value="GBP">£ - British Pound</option>
+        <option value="SGD">S$ - Singapore Dollar</option>
+        <option value="AUD">A$ - Australian Dollar</option>
+        <option value="CAD">C$ - Canadian Dollar</option>
+        <option value="AED">د.إ - UAE Dirham</option>
+        <option value="JPY">¥ - Japanese Yen</option>
+        <!-- Add more as needed -->
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <% if (plans && plans.length > 0) { %>
+      <% plans.forEach(function(plan) { %>
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 plan-card" data-plan-id="<%= plan._id %>" data-plan-usd="<%= plan.setprice.price %>">
+            <div class="card-body">
+              <h5 class="card-title"><%= plan.planname %></h5>
+              <p class="card-text"><%= plan.shortDescription || plan.description %></p>
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item">Duration: <%= plan.duration %> <%= plan.durationUnit %></li>
+                <li class="list-group-item">Sessions: <%= plan.totalsessions %></li>
+                <li class="list-group-item">Price: <span id="displayed-price-<%= plan._id %>"><%= plan.setprice.currencySymbol %><%= plan.setprice.price %></span></li>
+                <% if (plan.setprice.discount > 0) { %>
+                  <li class="list-group-item text-success">Discount: <%= plan.setprice.discount %>%</li>
+                <% } %>
+              </ul>
+              <!-- Slot type selector -->
+              <div class="mb-2">
+                <label for="slot-type-<%= plan._id %>" class="form-label">Slot Type</label>
+                <select class="form-select" id="slot-type-<%= plan._id %>">
+                  <option value="mon-thu-sat">Monday, Thursday, Saturday</option>
+                  <option value="tue-wed-fri">Tuesday, Wednesday, Friday</option>
+                </select>
+              </div>
+              <button class="btn btn-primary w-100" onclick="buyPlan('<%= plan._id %>')">Buy</button>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="col-12">
+        <div class="alert alert-info text-center">No plans available at the moment.</div>
+      </div>
+    <% } %>
+  </div>
+</div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/js/user-panel/plans.js"></script> 
