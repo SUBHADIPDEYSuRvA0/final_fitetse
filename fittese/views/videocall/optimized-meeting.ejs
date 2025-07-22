@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Meeting - <%= room.title %></title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Socket.IO -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <style>
+    /* Enhanced styles for multiple users */
+    :root {
+      --primary-color: #0b3d2e;
+      --secondary-color: #3e9278;
+      --accent-color: #28a745;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --dark-bg: #1a1a1a;
+      --card-bg: #2d2d2d;
+      --text-light: #ffffff;
+      --text-muted: #b0b0b0;
+      --border-color: #404040;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-light);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    .meeting-container {
+      display: flex;
+      height: 100vh;
+      position: relative;
+    }
+
+    /* Adaptive Video Grid */
+    .video-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--dark-bg);
+    }
+
+    .video-grid {
+      flex: 1;
+      display: grid;
+      gap: 8px;
+      padding: 15px;
+      overflow-y: auto;
+      background: var(--dark-bg);
+    }
+
+    /* Dynamic grid layouts based on participant count */
+    .video-grid.participants-1 { grid-template-columns: 1fr; }
+    .video-grid.participants-2 { grid-template-columns: 1fr 1fr; }
+    .video-grid.participants-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .video-grid.participants-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .video-grid.participants-5,
+    .video-grid.participants-6 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+    .video-grid.participants-7,
+    .video-grid.participants-8,
+    .video-grid.participants-9 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+    .video-grid.participants-10,
+    .video-grid.participants-11,
+    .video-grid.participants-12 { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
+    .video-grid.many-participants { grid-template-columns: repeat(5, 1fr); }
+
+    .video-item {
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      min-height: 120px;
+      transition: transform 0.2s ease;
+    }
+
+    .video-item:hover {
+      transform: scale(1.02);
+      z-index: 10;
+    }
+
+    .video-item.speaking {
+      border: 3px solid var(--accent-color);
+      box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+    }
+
+    .video-item.poor-connection {
+      border: 2px solid var(--danger-color);
+    }
+
+    .video-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: var(--card-bg);
+    }
+
+    /* Quality indicators */
+    .quality-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .quality-bar {
+      width: 3px;
+      height: 12px;
+      background: var(--text-muted);
+      border-radius: 1px;
+    }
+
+    .quality-bar.active.excellent { background: #00ff00; }
+    .quality-bar.active.good { background: var(--accent-color); }
+    .quality-bar.active.fair { background: var(--warning-color); }
+    .quality-bar.active.poor { background: var(--danger-color); }
+
+    /* Bandwidth indicator */
+    .bandwidth-indicator {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Enhanced controls */
+    .video-controls {
+      background: var(--card-bg);
+      padding: 15px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .control-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--card-bg);
+      color: var(--text-light);
+      border: 2px solid var(--border-color);
+      position: relative;
+    }
+
+    .quality-selector {
+      background: var(--card-bg);
+      color: var(--text-light);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Network status */
+    .network-status {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 1000;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+      .video-grid.participants-3,
+      .video-grid.participants-4 { grid-template-columns: 1fr 1fr; }
+      .video-grid.participants-5,
+      .video-grid.participants-6,
+      .video-grid.participants-7,
+      .video-grid.participants-8,
+      .video-grid.participants-9 { grid-template-columns: 1fr 1fr; }
+      .video-grid.many-participants { grid-template-columns: repeat(2, 1fr); }
+      
+      .control-btn { width: 40px; height: 40px; font-size: 0.9rem; }
+    }
+
+    /* Loading optimization */
+    .video-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    <div>Optimizing for <%= room.title %>...</div>
+  </div>
+
+  <div id="meeting-container" class="meeting-container" style="display: none;">
+    <!-- Network Status -->
+    <div class="network-status" id="network-status">
+      <div>Connection: <span id="connection-quality">Good</span></div>
+      <div>Bandwidth: <span id="bandwidth">0 kbps</span></div>
+      <div>Participants: <span id="participant-count">0</span></div>
+    </div>
+
+    <!-- Main Video Area -->
+    <div class="video-main">
+      <!-- Video Grid with dynamic layout -->
+      <div class="video-grid participants-1" id="video-grid">
+        <!-- Video items will be added here dynamically -->
+      </div>
+
+      <!-- Enhanced Controls -->
+      <div class="video-controls">
+        <div class="control-group">
+          <button class="control-btn" id="toggle-audio" title="Mute/Unmute">
+            <i class="bi bi-mic-fill"></i>
+          </button>
+          <button class="control-btn" id="toggle-video" title="Video On/Off">
+            <i class="bi bi-camera-video-fill"></i>
+          </button>
+        </div>
+
+        <div class="control-group">
+          <button class="control-btn" id="toggle-screen-share" title="Share Screen">
+            <i class="bi bi-display"></i>
+          </button>
+          <select class="quality-selector" id="quality-selector">
+            <option value="auto">Auto Quality</option>
+            <option value="high">High Quality</option>
+            <option value="medium">Medium Quality</option>
+            <option value="low">Low Quality</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <button class="control-btn" id="toggle-chat" title="Chat">
+            <i class="bi bi-chat-dots"></i>
+          </button>
+          <button class="control-btn" id="toggle-participants" title="Participants">
+            <i class="bi bi-people"></i>
+          </button>
+        </div>
+
+        <div class="control-group">
+          <button class="control-btn danger" id="leave-meeting" title="Leave Meeting">
+            <i class="bi bi-telephone-x"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced configuration
+    const config = {
+      roomId: '<%= room.roomId %>',
+      meetingId: '<%= room.meetingId %>',
+      token: '<%= token %>',
+      user: {
+        id: '<%= user.id %>',
+        name: '<%= user.name %>',
+        email: '<%= user.email %>',
+        role: '<%= user.role %>'
+      },
+      room: {
+        title: '<%= room.title %>',
+        settings: <%- JSON.stringify(room.settings) %>
+      }
+    };
+
+    // Enhanced WebRTC Manager
+    class EnhancedWebRTCManager {
+      constructor() {
+        this.socket = null;
+        this.localStream = null;
+        this.screenStream = null;
+        this.peers = new Map();
+        this.participants = new Map();
+        this.networkQuality = 'good';
+        this.isOptimizing = false;
+        this.qualityMode = 'auto';
+        
+        this.rtcConfig = {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+          ],
+          iceTransportPolicy: 'all',
+          bundlePolicy: 'max-bundle',
+          rtcpMuxPolicy: 'require'
+        };
+      }
+
+      async init() {
+        try {
+          await this.connectSocket();
+          await this.requestOptimizedConfig();
+          await this.initializeMedia();
+          this.setupEventListeners();
+          this.startNetworkMonitoring();
+          this.hideLoading();
+        } catch (error) {
+          console.error('Initialization error:', error);
+          this.showNotification('Failed to initialize meeting', 'error');
+        }
+      }
+
+      async connectSocket() {
+        this.socket = io({
+          auth: { token: config.token },
+          transports: ['websocket', 'polling']
+        });
+
+        this.socket.on('connect', () => {
+          console.log('Connected to server');
+          this.updateConnectionStatus('excellent');
+          this.socket.emit('join-room', {
+            name: config.user.name,
+            email: config.user.email,
+            isAudioEnabled: true,
+            isVideoEnabled: true
+          });
+        });
+
+        this.socket.on('ice-servers-config', (optimizedConfig) => {
+          this.rtcConfig = optimizedConfig;
+          console.log('Received optimized ICE configuration');
+        });
+
+        this.socket.on('quality-adaptation-settings', (settings) => {
+          this.applyQualitySettings(settings);
+        });
+
+        this.socket.on('participant-quality-update', (data) => {
+          this.updateParticipantQuality(data);
+        });
+
+        this.setupSocketEvents();
+      }
+
+      async requestOptimizedConfig() {
+        this.socket.emit('request-ice-servers');
+      }
+
+      async initializeMedia() {
+        const participantCount = this.participants.size + 1;
+        const constraints = this.getOptimalConstraints(participantCount);
+        
+        try {
+          this.localStream = await navigator.mediaDevices.getUserMedia(constraints);
+          this.addVideoToGrid(config.user.id, this.localStream, true);
+          this.startQualityMonitoring();
+        } catch (error) {
+          console.error('Media initialization error:', error);
+          this.showNotification('Failed to access camera/microphone', 'error');
+        }
+      }
+
+      getOptimalConstraints(participantCount) {
+        let quality = 'medium';
+        
+        if (this.qualityMode !== 'auto') {
+          quality = this.qualityMode;
+        } else {
+          if (participantCount <= 2) {
+            quality = this.networkQuality === 'excellent' ? 'high' : 'medium';
+          } else if (participantCount <= 4) {
+            quality = this.networkQuality === 'excellent' ? 'medium' : 'low';
+          } else {
+            quality = 'low';
+          }
+        }
+
+        const qualitySettings = {
+          low: { width: 320, height: 240, frameRate: 15 },
+          medium: { width: 640, height: 480, frameRate: 20 },
+          high: { width: 1280, height: 720, frameRate: 30 }
+        };
+
+        const settings = qualitySettings[quality];
+        
+        return {
+          video: {
+            width: { ideal: settings.width },
+            height: { ideal: settings.height },
+            frameRate: { ideal: settings.frameRate },
+            facingMode: 'user'
+          },
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        };
+      }
+
+      setupSocketEvents() {
+        this.socket.on('room-joined', (data) => {
+          this.participants = new Map(data.room.participants.map(p => [p.id, p]));
+          this.updateParticipantCount();
+          this.updateVideoGridLayout();
+          
+          data.room.participants.forEach(participant => {
+            if (participant.id !== config.user.id) {
+              this.createPeerConnection(participant.id);
+            }
+          });
+        });
+
+        this.socket.on('participant-joined', (data) => {
+          this.participants.set(data.participant.id, data.participant);
+          this.updateParticipantCount();
+          this.updateVideoGridLayout();
+          this.createPeerConnection(data.participant.id);
+          this.adaptToParticipantCount();
+        });
+
+        this.socket.on('participant-left', (data) => {
+          this.participants.delete(data.participantId);
+          this.removeVideoFromGrid(data.participantId);
+          this.updateParticipantCount();
+          this.updateVideoGridLayout();
+          this.adaptToParticipantCount();
+          
+          const peer = this.peers.get(data.participantId);
+          if (peer) {
+            peer.close();
+            this.peers.delete(data.participantId);
+          }
+        });
+
+        // WebRTC events
+        this.socket.on('offer', this.handleOffer.bind(this));
+        this.socket.on('answer', this.handleAnswer.bind(this));
+        this.socket.on('ice-candidate', this.handleIceCandidate.bind(this));
+      }
+
+      async createPeerConnection(participantId) {
+        const peer = new RTCPeerConnection(this.rtcConfig);
+        this.peers.set(participantId, peer);
+
+        // Add local stream
+        if (this.localStream) {
+          this.localStream.getTracks().forEach(track => {
+            peer.addTrack(track, this.localStream);
+          });
+        }
+
+        // Handle incoming streams
+        peer.ontrack = (event) => {
+          const stream = event.streams[0];
+          this.addVideoToGrid(participantId, stream);
+        };
+
+        // Handle ICE candidates
+        peer.onicecandidate = (event) => {
+          if (event.candidate) {
+            this.socket.emit('ice-candidate', {
+              target: participantId,
+              candidate: event.candidate
+            });
+          }
+        };
+
+        // Monitor connection quality
+        this.monitorPeerConnection(peer, participantId);
+
+        // Create and send offer
+        try {
+          const offer = await peer.createOffer();
+          await peer.setLocalDescription(offer);
+          this.socket.emit('offer', {
+            target: participantId,
+            offer
+          });
+        } catch (error) {
+          console.error('Error creating offer:', error);
+        }
+      }
+
+      async handleOffer(data) {
+        const peer = new RTCPeerConnection(this.rtcConfig);
+        this.peers.set(data.from, peer);
+
+        // Add local stream
+        if (this.localStream) {
+          this.localStream.getTracks().forEach(track => {
+            peer.addTrack(track, this.localStream);
+          });
+        }
+
+        // Handle incoming streams
+        peer.ontrack = (event) => {
+          const stream = event.streams[0];
+          this.addVideoToGrid(data.from, stream);
+        };
+
+        // Handle ICE candidates
+        peer.onicecandidate = (event) => {
+          if (event.candidate) {
+            this.socket.emit('ice-candidate', {
+              target: data.from,
+              candidate: event.candidate
+            });
+          }
+        };
+
+        // Monitor connection quality
+        this.monitorPeerConnection(peer, data.from);
+
+        try {
+          await peer.setRemoteDescription(data.offer);
+          const answer = await peer.createAnswer();
+          await peer.setLocalDescription(answer);
+          this.socket.emit('answer', {
+            target: data.from,
+            answer
+          });
+        } catch (error) {
+          console.error('Error handling offer:', error);
+        }
+      }
+
+      async handleAnswer(data) {
+        const peer = this.peers.get(data.from);
+        if (peer) {
+          try {
+            await peer.setRemoteDescription(data.answer);
+          } catch (error) {
+            console.error('Error handling answer:', error);
+          }
+        }
+      }
+
+      async handleIceCandidate(data) {
+        const peer = this.peers.get(data.from);
+        if (peer) {
+          try {
+            await peer.addIceCandidate(data.candidate);
+          } catch (error) {
+            console.error('Error adding ICE candidate:', error);
+          }
+        }
+      }
+
+      monitorPeerConnection(peer, participantId) {
+        const monitor = async () => {
+          try {
+            const stats = await peer.getStats();
+            let bandwidth = 0;
+            let rtt = 0;
+            let packetLoss = 0;
+
+            stats.forEach(report => {
+              if (report.type === 'outbound-rtp' && report.kind === 'video') {
+                bandwidth = report.availableOutgoingBitrate || 0;
+              } else if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+                rtt = report.currentRoundTripTime || 0;
+              } else if (report.type === 'inbound-rtp') {
+                packetLoss = report.packetsLost / (report.packetsReceived + report.packetsLost) || 0;
+              }
+            });
+
+            const quality = this.detectNetworkQuality({ bandwidth: bandwidth * 1000, rtt: rtt * 1000, packetLoss });
+            this.updateParticipantConnectionQuality(participantId, quality);
+
+          } catch (error) {
+            console.error('Error monitoring peer connection:', error);
+          }
+        };
+
+        setInterval(monitor, 5000);
+      }
+
+      detectNetworkQuality(stats) {
+        const bandwidth = stats.bandwidth || 1000;
+        const rtt = stats.rtt || 50;
+        const packetLoss = stats.packetLoss || 0;
+
+        if (bandwidth > 2000 && rtt < 50 && packetLoss < 0.01) {
+          return 'excellent';
+        } else if (bandwidth > 1000 && rtt < 100 && packetLoss < 0.03) {
+          return 'good';
+        } else if (bandwidth > 500 && rtt < 200 && packetLoss < 0.05) {
+          return 'fair';
+        } else {
+          return 'poor';
+        }
+      }
+
+      startNetworkMonitoring() {
+        setInterval(() => {
+          this.socket.emit('network-quality-update', {
+            quality: this.networkQuality,
+            stats: {
+              bandwidth: this.getBandwidth(),
+              rtt: this.getRTT(),
+              packetLoss: this.getPacketLoss()
+            }
+          });
+        }, 10000);
+      }
+
+      adaptToParticipantCount() {
+        const participantCount = this.participants.size + 1;
+        
+        if (this.qualityMode === 'auto' && !this.isOptimizing) {
+          this.isOptimizing = true;
+          
+          setTimeout(async () => {
+            const newConstraints = this.getOptimalConstraints(participantCount);
+            await this.updateMediaConstraints(newConstraints);
+            this.isOptimizing = false;
+          }, 1000);
+        }
+
+        // Request quality adaptation from server
+        this.socket.emit('request-quality-adaptation', {
+          participantCount,
+          networkQuality: this.networkQuality
+        });
+      }
+
+      async updateMediaConstraints(constraints) {
+        if (this.localStream) {
+          const videoTrack = this.localStream.getVideoTracks()[0];
+          if (videoTrack) {
+            try {
+              await videoTrack.applyConstraints(constraints.video);
+            } catch (error) {
+              console.error('Error applying video constraints:', error);
+            }
+          }
+        }
+      }
+
+      addVideoToGrid(participantId, stream, isLocal = false) {
+        const videoGrid = document.getElementById('video-grid');
+        const existingVideo = document.getElementById(`video-${participantId}`);
+        
+        if (existingVideo) {
+          existingVideo.remove();
+        }
+        
+        const videoItem = document.createElement('div');
+        videoItem.className = 'video-item';
+        videoItem.id = `video-${participantId}`;
+        
+        const video = document.createElement('video');
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = isLocal;
+        video.srcObject = stream;
+        
+        // Add quality indicators
+        const qualityIndicator = document.createElement('div');
+        qualityIndicator.className = 'quality-indicator';
+        qualityIndicator.innerHTML = `
+          <div class="quality-bar"></div>
+          <div class="quality-bar"></div>
+          <div class="quality-bar"></div>
+          <div class="quality-bar"></div>
+        `;
+        
+        const bandwidthIndicator = document.createElement('div');
+        bandwidthIndicator.className = 'bandwidth-indicator';
+        bandwidthIndicator.textContent = '0 kbps';
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'video-overlay';
+        overlay.innerHTML = `
+          <div class="participant-name">${isLocal ? 'You' : this.participants.get(participantId)?.name || 'Unknown'}</div>
+        `;
+        
+        videoItem.appendChild(video);
+        videoItem.appendChild(qualityIndicator);
+        videoItem.appendChild(bandwidthIndicator);
+        videoItem.appendChild(overlay);
+        videoGrid.appendChild(videoItem);
+      }
+
+      removeVideoFromGrid(participantId) {
+        const videoItem = document.getElementById(`video-${participantId}`);
+        if (videoItem) {
+          videoItem.remove();
+        }
+        this.updateVideoGridLayout();
+      }
+
+      updateVideoGridLayout() {
+        const videoGrid = document.getElementById('video-grid');
+        const participantCount = this.participants.size + 1;
+        
+        // Remove existing classes
+        videoGrid.className = 'video-grid';
+        
+        // Add appropriate class based on participant count
+        if (participantCount > 12) {
+          videoGrid.classList.add('many-participants');
+        } else {
+          videoGrid.classList.add(`participants-${participantCount}`);
+        }
+      }
+
+      updateParticipantCount() {
+        const count = this.participants.size + 1;
+        document.getElementById('participant-count').textContent = count;
+      }
+
+      updateParticipantConnectionQuality(participantId, quality) {
+        const videoItem = document.getElementById(`video-${participantId}`);
+        if (videoItem) {
+          const qualityBars = videoItem.querySelectorAll('.quality-bar');
+          const qualityLevels = { poor: 1, fair: 2, good: 3, excellent: 4 };
+          const level = qualityLevels[quality] || 2;
+          
+          qualityBars.forEach((bar, index) => {
+            bar.classList.toggle('active', index < level);
+            if (index < level) {
+              bar.classList.add(quality);
+            }
+          });
+          
+          // Update video item class
+          videoItem.classList.toggle('poor-connection', quality === 'poor');
+        }
+      }
+
+      setupEventListeners() {
+        document.getElementById('toggle-audio').addEventListener('click', this.toggleAudio.bind(this));
+        document.getElementById('toggle-video').addEventListener('click', this.toggleVideo.bind(this));
+        document.getElementById('toggle-screen-share').addEventListener('click', this.toggleScreenShare.bind(this));
+        document.getElementById('quality-selector').addEventListener('change', this.changeQuality.bind(this));
+        document.getElementById('leave-meeting').addEventListener('click', this.leaveMeeting.bind(this));
+      }
+
+      async toggleAudio() {
+        if (this.localStream) {
+          const audioTrack = this.localStream.getAudioTracks()[0];
+          if (audioTrack) {
+            audioTrack.enabled = !audioTrack.enabled;
+            this.socket.emit('toggle-audio', { isEnabled: audioTrack.enabled });
+            this.updateControlButton('toggle-audio', audioTrack.enabled);
+          }
+        }
+      }
+
+      async toggleVideo() {
+        if (this.localStream) {
+          const videoTrack = this.localStream.getVideoTracks()[0];
+          if (videoTrack) {
+            videoTrack.enabled = !videoTrack.enabled;
+            this.socket.emit('toggle-video', { isEnabled: videoTrack.enabled });
+            this.updateControlButton('toggle-video', videoTrack.enabled);
+          }
+        }
+      }
+
+      async toggleScreenShare() {
+        // Implementation for screen sharing
+        console.log('Screen share toggled');
+      }
+
+      changeQuality(event) {
+        this.qualityMode = event.target.value;
+        this.adaptToParticipantCount();
+      }
+
+      updateControlButton(buttonId, isActive) {
+        const button = document.getElementById(buttonId);
+        button.classList.toggle('active', isActive);
+      }
+
+      leaveMeeting() {
+        if (confirm('Are you sure you want to leave the meeting?')) {
+          window.location.href = '/';
+        }
+      }
+
+      showNotification(message, type = 'success') {
+        console.log(`${type}: ${message}`);
+      }
+
+      hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('meeting-container').style.display = 'flex';
+      }
+
+      getBandwidth() { return 1000; }
+      getRTT() { return 50; }
+      getPacketLoss() { return 0.01; }
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      const webrtcManager = new EnhancedWebRTCManager();
+      webrtcManager.init();
+    });
+  </script>
+</body>
+</html>

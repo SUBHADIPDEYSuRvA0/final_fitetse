@@ -1,6 +1,8 @@
 const socketIo = require('socket.io');
 const jwt = require('jsonwebtoken');
 const VideoRoom = require('../model/videoRooms');
+const TurnServerConfig = require('./turnServer');
+const VideoOptimizer = require('./videoOptimizer');
 const User = require('../model/user');
 const recordingService = require('./recordingService');
 
@@ -15,11 +17,16 @@ class SocketServer {
         methods: ["GET", "POST"],
         credentials: true
       },
+      pingTimeout: 60000,
+      pingInterval: 25000,
+      maxHttpBufferSize: 1e6,
       transports: ['websocket', 'polling']
     });
 
     this.rooms = new Map(); // Active rooms
     this.participants = new Map(); // Active participants
+    this.turnConfig = new TurnServerConfig();
+    this.videoOptimizer = new VideoOptimizer();
     this.setupMiddleware();
     this.setupEventHandlers();
   }
@@ -90,6 +97,21 @@ class SocketServer {
       // Room management
       socket.on('request-join', (data) => {
         this.handleRequestJoin(socket, data);
+      });
+
+      // Request ICE servers configuration
+      socket.on('request-ice-servers', () => {
+        this.handleRequestIceServers(socket);
+      });
+
+      // Network quality reporting
+      socket.on('network-quality-update', (data) => {
+        this.handleNetworkQualityUpdate(socket, data);
+      });
+
+      // Bandwidth adaptation
+      socket.on('request-quality-adaptation', (data) => {
+        this.handleQualityAdaptation(socket, data);
       });
 
       socket.on('approve-join', (data) => {
@@ -573,6 +595,68 @@ class SocketServer {
     } catch (error) {
       console.error('Error saving chat message:', error);
     }
+  }
+
+  // Handle ICE servers request
+  handleRequestIceServers(socket) {
+    const iceServers = this.turnConfig.getRTCConfiguration();
+    const participantCount = this.getParticipantCount(socket.roomId);
+    const optimizedConfig = {
+      ...iceServers,
+      ...this.videoOptimizer.getOptimalConstraints(participantCount)
+    };
+    
+    socket.emit('ice-servers-config', optimizedConfig);
+  }
+
+  // Handle network quality update
+  handleNetworkQualityUpdate(socket, data) {
+    const participant = this.participants.get(socket.userId);
+    if (participant) {
+      participant.networkQuality = data.quality;
+      participant.networkStats = data.stats;
+      
+      // Broadcast quality update to room
+      socket.to(socket.roomId).emit('participant-quality-update', {
+        participantId: socket.userId,
+        quality: data.quality,
+        stats: data.stats
+      });
+    }
+  }
+
+  // Handle quality adaptation request
+  handleQualityAdaptation(socket, data) {
+    const participantCount = this.getParticipantCount(socket.roomId);
+    const adaptationSettings = this.videoOptimizer.getAdaptiveBitrateSettings(
+      participantCount, 
+      data.networkQuality
+    );
+    
+    socket.emit('quality-adaptation-settings', adaptationSettings);
+  }
+
+  // Handle screen share toggle
+  handleToggleScreenShare(socket, data) {
+    const { isSharing } = data;
+    const participant = this.participants.get(socket.userId);
+    
+    if (participant) {
+      participant.isScreenSharing = isSharing;
+      
+      // Broadcast to all participants in room
+      socket.to(socket.roomId).emit('participant-screen-share-toggled', {
+        participantId: socket.userId,
+        name: participant.name,
+        isSharing
+      });
+    }
+  }
+
+  // Get participant count for a room
+  getParticipantCount(roomId) {
+    const room = this.rooms.get(roomId);
+    return room ? room.participants.size : 0;
   }
 
   // Get room statistics
