@@ -11,7 +11,7 @@ class SingleDomainManager {
     this.setupRoutes();
     this.setupStaticFiles();
     this.setupAPIRoutes();
-    this.setupVideoCallRoutes();
+    // this.setupVideoCallRoutes(); // temporarily disabled
   }
 
   /**
@@ -82,14 +82,60 @@ class SingleDomainManager {
    * Setup API routes with versioning
    */
   setupAPIRoutes() {
-    // API v1 routes
+    // Direct API routes for frontend compatibility
+    const userAuthController = require('../controller/user/userAuth.controller');
+    const Slot = require('../model/slots');
+    
+    // Handle direct API endpoints that frontend expects
+    this.app.post('/api/login', async (req, res) => {
+      try {
+        await userAuthController.login(req, res);
+      } catch (error) {
+        console.error('API login error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error during login' });
+      }
+    });
+    
+    this.app.post('/api/signup', async (req, res) => {
+      try {
+        await userAuthController.signup(req, res);
+      } catch (error) {
+        console.error('API signup error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error during signup' });
+      }
+    });
+    
+    this.app.get('/api/slots', async (req, res) => {
+      try {
+        const now = new Date();
+        const slots = await Slot.find({ 
+          status: 'available', 
+          start: { $gte: now } 
+        }).sort({ start: 1 });
+        res.json(slots);
+      } catch (error) {
+        console.error('API slots error:', error);
+        res.status(500).json({ success: false, message: 'Error fetching slots' });
+      }
+    });
+    
+    // API v1 routes - temporarily disabled for debugging
+    /*
     this.app.use('/api/v1/auth', require('../router/api/auth'));
     this.app.use('/api/v1/users', require('../router/api/users'));
     this.app.use('/api/v1/meetings', require('../router/api/meetings'));
     this.app.use('/api/v1/analytics', require('../router/api/analytics'));
+    */
 
-    // Legacy API routes (for backward compatibility)
+    // Admin routes - temporarily disabled for debugging
+    /*
+    this.app.use('/admin', require('../router/admin'));
+    */
+
+    // Legacy API routes (for backward compatibility) - temporarily disabled
+    /*
     this.app.use('/api', require('../router/api/legacy'));
+    */
 
     // API documentation
     this.app.get('/api-docs', (req, res) => {
@@ -110,8 +156,9 @@ class SingleDomainManager {
     // Video call main routes
     this.app.use('/video', require('../router/video/index'));
 
-    // Load balancer middleware for video calls
-    this.app.use('/video/*', (req, res, next) => {
+    // Load balancer middleware for video calls - temporarily disabled
+    /*
+    this.app.use('/video/:roomId', (req, res, next) => {
       const roomId = req.params.meetingId || req.body.roomId;
       
       if (roomId && !loadBalancer.canJoinRoom(roomId)) {
@@ -124,6 +171,7 @@ class SingleDomainManager {
       
       next();
     });
+    */
 
     // Real-time load balancing endpoint
     this.app.get('/api/v1/load-status', (req, res) => {
