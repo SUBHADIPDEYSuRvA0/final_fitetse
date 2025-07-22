@@ -659,6 +659,30 @@ class SocketServer {
     return room ? room.participants.size : 0;
   }
 
+  // Set load balancer instance
+  setLoadBalancer(loadBalancer) {
+    this.loadBalancer = loadBalancer;
+  }
+
+  // Set performance optimizer instance
+  setPerformanceOptimizer(performanceOptimizer) {
+    this.performanceOptimizer = performanceOptimizer;
+  }
+
+  // Update room load metrics
+  updateRoomLoadMetrics(roomId) {
+    if (this.loadBalancer) {
+      const room = this.rooms.get(roomId);
+      if (room) {
+        const participants = Array.from(room.participants.values());
+        const bandwidth = participants.reduce((total, p) => total + (p.bandwidth || 0), 0);
+        const cpuImpact = participants.length * 10; // Rough estimate
+        
+        this.loadBalancer.updateRoomLoad(roomId, participants.length, bandwidth, cpuImpact);
+      }
+    }
+  }
+
   // Get room statistics
   getRoomStats() {
     const stats = {
