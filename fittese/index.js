@@ -71,12 +71,15 @@ app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 
-// Initialize Single Domain Manager
+// Initialize Single Domain Manager - temporarily disabled
+/*
 const singleDomainManager = new SingleDomainManager(app);
 singleDomainManager.initialize();
+*/
 
-// Load balancing middleware for video calls
-app.use('/video/*', (req, res, next) => {
+// Load balancing middleware for video calls - temporarily disabled
+/*
+app.use('/video/:roomId', (req, res, next) => {
   if (!loadBalancer.canCreateRoom()) {
     return res.status(503).json({
       error: 'Server overloaded',
@@ -86,9 +89,50 @@ app.use('/video/*', (req, res, next) => {
   }
   next();
 });
+*/
+
+// Essential API routes for frontend integration
+const userAuthController = require('./app/controller/user/userAuth.controller');
+const Slot = require('./app/model/slots');
+
+// API endpoints for frontend
+app.post('/api/login', async (req, res) => {
+  try {
+    await userAuthController.login(req, res);
+  } catch (error) {
+    console.error('API login error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error during login' });
+  }
+});
+
+app.post('/api/signup', async (req, res) => {
+  try {
+    await userAuthController.signup(req, res);
+  } catch (error) {
+    console.error('API signup error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error during signup' });
+  }
+});
+
+app.get('/api/slots', async (req, res) => {
+  try {
+    const now = new Date();
+    const slots = await Slot.find({ 
+      status: 'available', 
+      start: { $gte: now } 
+    }).sort({ start: 1 });
+    res.json(slots);
+  } catch (error) {
+    console.error('API slots error:', error);
+    res.status(500).json({ success: false, message: 'Error fetching slots' });
+  }
+});
+
+// Admin routes
+app.use('/admin', require('./app/router/admin'));
 
 // Performance monitoring middleware
-app.use('/api/*', (req, res, next) => {
+app.use('/api', (req, res, next) => {
   const startTime = Date.now();
   
   res.on('finish', () => {
@@ -211,7 +255,7 @@ setInterval(async () => {
 
 // --- SOCKET.IO SETUP END ---
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3200;
 
 server.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
