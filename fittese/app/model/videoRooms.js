@@ -268,12 +268,14 @@ videoRoomSchema.virtual('activeParticipants').get(function() {
   return this.participants.filter(p => !p.leftAt && p.socketId);
 });
 
+const BASE_URL = process.env.BASE_URL || require('../../config').BASE_URL || 'http://localhost:3000';
+
 videoRoomSchema.virtual('joinUrl').get(function() {
-  return `${process.env.BASE_URL || 'http://localhost:3000'}/video/join/${this.meetingId}`;
+  return `${BASE_URL}/video/join/${this.meetingId}`;
 });
 
 videoRoomSchema.virtual('hostUrl').get(function() {
-  return `${process.env.BASE_URL || 'http://localhost:3000'}/video/host/${this.meetingId}`;
+  return `${BASE_URL}/video/host/${this.meetingId}`;
 });
 
 videoRoomSchema.virtual('formattedDuration').get(function() {

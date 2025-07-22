@@ -10,7 +10,7 @@ mongoose.connect('mongodb://localhost:27017/fittese', {
 async function createAdmin() {
     try {
         // Check if demo admin already exists
-        const existingAdmin = await User.findOne({ email: 'fitetse@gmail.com', role: 'admin' });
+        const existingAdmin = await User.findOne({ email: 'fittese@gmail.com', role: 'admin' });
         if (existingAdmin) {
             console.log('Demo admin already exists:', existingAdmin.email);
             console.log('To activate existing admin, run: node activate-admin.js');
@@ -18,7 +18,11 @@ async function createAdmin() {
         }
 
         // Create new demo admin
-        const hashedPassword = await bcrypt.hash('fitetse123', 12);
+        const adminPassword = process.env.ADMIN_PASSWORD || null;
+        if (!adminPassword) {
+            throw new Error('Admin password not set. Please set the ADMIN_PASSWORD environment variable.');
+        }
+        const hashedPassword = await bcrypt.hash(adminPassword, 12);
         
         const admin = new User({
             name: 'Demo Admin',
@@ -36,7 +40,7 @@ async function createAdmin() {
         
         console.log('✅ Demo admin account created successfully!');
         console.log('📧 Email: fitetse@gmail.com');
-        console.log('🔑 Password: fitetse123');
+        console.log(`🔑 Password: ${process.env.ADMIN_PASSWORD ? '[HIDDEN - from ENV]' : '[NOT SET]'}`);
         console.log('🔗 Login URL: http://localhost:3000/admin/login');
         
         console.log('\n⚠️  IMPORTANT: Change the password after first login!');

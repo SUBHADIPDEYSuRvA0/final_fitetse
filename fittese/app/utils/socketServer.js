@@ -4,6 +4,9 @@ const VideoRoom = require('../model/videoRooms');
 const User = require('../model/user');
 const recordingService = require('./recordingService');
 
+// Configurable participant limit
+const PARTICIPANT_LIMIT = process.env.PARTICIPANT_LIMIT ? parseInt(process.env.PARTICIPANT_LIMIT, 10) : 10;
+
 class SocketServer {
   constructor(server) {
     this.io = socketIo(server, {
@@ -145,7 +148,7 @@ class SocketServer {
       }
 
       // Check participant limit
-      if (room.participants.size >= 10) {
+      if (room.participants.size >= PARTICIPANT_LIMIT) {
         socket.emit('room-full', { message: 'Room is at maximum capacity' });
         return;
       }

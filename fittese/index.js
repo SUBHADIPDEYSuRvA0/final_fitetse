@@ -18,7 +18,7 @@ const app = express();
 connectDB();
 
 app.use(session({
-  secret: 'educate-mysecretkey', // use a strong secret in production
+  secret: process.env.SESSION_SECRET || 'fallback-secret', // use a strong secret in production
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 60000 } // 1 minute (adjust as needed)
@@ -48,7 +48,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.use("/", require("./app/router/admin/index"));
-app.use("/", require("./app/router/emplyee/index"));
+app.use("/", require("./app/router/employee/index"));
 app.use("/", require("./app/router/user/index"));
 app.use("/video", require("./app/router/video/index"));
 

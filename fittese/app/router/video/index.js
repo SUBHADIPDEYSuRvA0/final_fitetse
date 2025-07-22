@@ -38,15 +38,19 @@ router.get('/join/:meetingId', async (req, res) => {
     }
 
     // Get user info (from session or guest)
-    let user = null;
-    if (req.session && req.session.userId) {
-      try {
-        const User = require('../../model/user');
-        user = await User.findById(req.session.userId);
-      } catch (error) {
-        console.error('Error finding user:', error);
+    async function getUserFromSession(session) {
+      if (session && session.userId) {
+        try {
+          const User = require('../../model/user');
+          return await User.findById(session.userId);
+        } catch (error) {
+          console.error('Error finding user:', error);
+        }
       }
+      return null;
     }
+
+    let user = await getUserFromSession(req.session);
 
     if (!user) {
       // Guest user

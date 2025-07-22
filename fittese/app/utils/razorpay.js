@@ -15,7 +15,7 @@ const razorpay = new Razorpay({
  * @param {object} notes - Additional notes
  * @returns {Promise<object>} Razorpay order object
  */
-function createOrder(amount, currency = 'INR', receipt = undefined, notes = {}) {
+function createOrder(amount, currency = 'INR', receipt, notes = {}) {
   const options = {
     amount: Math.round(amount * 100), // Razorpay expects paise
     currency: currency.toUpperCase(),

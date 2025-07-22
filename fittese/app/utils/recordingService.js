@@ -142,29 +142,66 @@ class RecordingService {
 
   /**
    * Start FFmpeg recording with screen capture and audio
+   * Platform-specific configuration for Windows, macOS, and Linux.
    */
   startFFmpegRecording(outputPath, recording) {
-    const command = ffmpeg()
-      .input('desktop') // Screen capture
-      .inputOptions([
-        '-f gdigrab', // Windows screen capture
-        '-framerate 30',
-        '-i desktop'
-      ])
-      .input('audio=virtual-audio-capturer') // Audio capture
-      .inputOptions([
-        '-f dshow',
-        '-i audio=virtual-audio-capturer'
-      ])
+    const os = require('os');
+    const platform = os.platform();
+
+    let command = ffmpeg();
+
+    if (platform === 'win32') {
+      // Windows: gdigrab for screen, dshow for audio
+      command = command
+        .input('desktop')
+        .inputOptions([
+          '-f', 'gdigrab',
+          '-framerate', '30',
+          '-i', 'desktop'
+        ])
+        .input('audio=virtual-audio-capturer')
+        .inputOptions([
+          '-f', 'dshow',
+          '-i', 'audio=virtual-audio-capturer'
+        ]);
+    } else if (platform === 'darwin') {
+      // macOS: avfoundation for both screen and audio
+      // Note: You may need to adjust the device numbers (0:0) as per your system
+      command = command
+        .input('0:0')
+        .inputOptions([
+          '-f', 'avfoundation',
+          '-framerate', '30',
+          '-video_size', '1280x720'
+        ]);
+      // For audio, you may need to add another input for the audio device if available
+    } else {
+      // Linux: x11grab for screen, pulse for audio
+      // Note: You may need to adjust the display and audio device as per your system
+      command = command
+        .input(':0.0')
+        .inputOptions([
+          '-f', 'x11grab',
+          '-framerate', '30',
+          '-video_size', '1280x720'
+        ])
+        .input('default')
+        .inputOptions([
+          '-f', 'pulse',
+          '-i', 'default'
+        ]);
+    }
+
+    command = command
       .outputOptions([
-        '-c:v libx264', // Video codec
-        '-preset ultrafast',
-        '-crf 23', // Quality
-        '-c:a aac', // Audio codec
-        '-b:a 128k', // Audio bitrate
-        '-pix_fmt yuv420p',
-        '-movflags +faststart',
-        '-y' // Overwrite output
+        '-c:v', 'libx264',
+        '-preset', 'ultrafast',
+        '-crf', '23',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-pix_fmt', 'yuv420p',
+        '-movflags', '+faststart',
+        '-y'
       ])
       .output(outputPath)
       .on('start', (commandLine) => {
