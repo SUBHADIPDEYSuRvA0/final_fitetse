@@ -10,7 +10,7 @@ import Packages from './pages/Packages';
 import Termspage from './pages/Termspage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 
-import Login from './pages/login';
+import Login from './pages/Login';
 import SignUp from './components/SignUp'; 
 import Invoicepage from './pages/Invoicepage';
 import Dashboard from './pages/Dashboard';

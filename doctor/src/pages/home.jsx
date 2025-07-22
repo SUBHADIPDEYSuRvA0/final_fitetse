@@ -9,7 +9,7 @@ import FAQSection from '../components/FAQSection';
 import DietitianPanel from '../components/DietitianPanel';
 import Counter from '../components/Counter';
 import ConsultationForm from '../components/ConsultationForm';
-import Howsection from '../components/howsection';
+import Howsection from '../components/Howsection';
 import BMICalculator from '../components/bmi-calculator'
 
 import { motion } from 'framer-motion';

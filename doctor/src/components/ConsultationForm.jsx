@@ -33,7 +33,7 @@ const ConsultationForm = () => {
   const [success, setSuccess] = useState("")
 
   // API Configuration
-  const API_BASE_URL = "https://dashboard.fitetse.com"
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? "https://dashboard.fitetse.com" : ""
 
   // Fetch slots from backend API
   useEffect(() => {

@@ -5,7 +5,7 @@ import "./SignUp.css"
 import { Link } from "react-router-dom"
 
 // Add these API functions after the imports and before the component
-const API_BASE_URL = "https://dashboard.fitetse.com" // Adjust based on your backend URL
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? "https://dashboard.fitetse.com" : "" // Adjust based on your backend URL
 
 // API function to submit signup data
 const submitSignupData = async (formData) => {
@@ -198,7 +198,7 @@ export default function SignUp() {
         password: password,
       }
 
-      const response = await fetch("https://dashboard.fitetse.com/api/signup", {
+              const response = await fetch(process.env.NODE_ENV === 'production' ? "https://dashboard.fitetse.com/api/signup" : "/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

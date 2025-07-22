@@ -164,7 +164,7 @@ export default function EmployeePortal() {
 
       console.log("Attempting login with:", { email: loginData.email })
 
-      const response = await fetch("https://dashboard.fitetse.com/api/login", {
+      const response = await fetch(process.env.NODE_ENV === 'production' ? "https://dashboard.fitetse.com/api/login" : "/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

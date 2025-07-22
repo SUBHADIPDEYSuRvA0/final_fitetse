@@ -1,0 +1,20 @@
+{
+  "name": "fittese-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack fitness consultation app with React frontend and Node.js backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd fittese && npm run dev",
+    "frontend": "cd doctor && npm run dev",
+    "install-all": "npm install && cd fittese && npm install && cd ../doctor && npm install",
+    "build": "cd doctor && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["fitness", "consultation", "react", "nodejs", "fullstack"],
+  "author": "",
+  "license": "ISC"
+}

@@ -48,7 +48,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Routes
 app.use("/", require("./app/router/admin/index"));
-app.use("/", require("./app/router/employee/index"));
+app.use("/", require("./app/router/emplyee/index"));
 app.use("/", require("./app/router/user/index"));
 app.use("/video", require("./app/router/video/index"));
 
